@@ -1,13 +1,13 @@
 import time
-import logging
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 
 from src.utils.llm import LLMClient
 from src.models.agent_io import AgentTask, AgentResult, ResultStatus, AgentType
+from src.utils.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger("agents")
 
 class BaseAgent(ABC):
     def __init__(self, llm_client: LLMClient, agent_name: str):
@@ -36,16 +36,15 @@ class BaseAgent(ABC):
     async def execute(self, task: AgentTask) -> AgentResult:
         """Executes the agent task with timing and error handling."""
         start_time = time.time()
-        logger.info(f"Starting {self.agent_name} for task {task.task_id}")
+        log = logger.bind(agent_type=self.agent_name, task_id=task.task_id)
         
         try:
             result = await self._do_execute(task)
             result.duration_ms = int((time.time() - start_time) * 1000)
-            logger.info(f"{self.agent_name} completed task {task.task_id} in {result.duration_ms}ms")
             return result
         except Exception as e:
             duration_ms = int((time.time() - start_time) * 1000)
-            logger.exception(f"{self.agent_name} failed on task {task.task_id}")
+            log.error("agent_execution_failed", error=str(e), duration_ms=duration_ms)
             return AgentResult(
                 task_id=task.task_id,
                 agent_type=task.agent_type,

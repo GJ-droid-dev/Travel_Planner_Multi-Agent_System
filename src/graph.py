@@ -15,6 +15,9 @@ from src.agents.budget import BudgetAgent
 from src.agents.review import ReviewAgent
 
 from src.utils.llm import GeminiClient, GroqClient
+from src.utils.logger import get_logger
+
+logger = get_logger("graph")
 
 # 1. Dependency Injection / App Setup
 def get_llm_client(agent_type: str):
@@ -32,15 +35,20 @@ TIMEOUT = 30 # seconds
 
 # 2. Node Wrapper
 async def run_agent_node(agent, task: AgentTask, result_key: str) -> dict:
+    log = logger.bind(agent_type=agent.name, task_id=task.task_id)
+    log.info("agent_started")
     try:
         result = await asyncio.wait_for(agent.execute(task), timeout=TIMEOUT)
+        log.info("agent_completed", duration_ms=0, status=result.status.value)
         return {result_key: result}
     except TimeoutError:
+        log.warning("agent_timeout")
         return {
             result_key: AgentResult.partial_timeout(task),
             "warnings": [f"{agent.name} timed out."]
         }
     except Exception as exc:
+        log.error("agent_failed", error=str(exc))
         return {
             result_key: AgentResult.failed(task, str(exc)),
             "errors": [f"{agent.name} failed: {exc}"]

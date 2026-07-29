@@ -1,5 +1,6 @@
 from pydantic import SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import List
 
 class Settings(BaseSettings):
     # Gemini — used by Orchestrator, Destination, Logistics, Budget agents
@@ -14,6 +15,8 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 8192
     max_revision_loops: int = 2
     agent_timeout_seconds: int = 30
+    request_timeout_seconds: int = 90
+    cors_origins: List[str] = ["http://localhost:3000", "http://localhost:5173"]
     parallel_agent_execution: bool = True
     exchange_rate_usd_aed: float = 3.67
     app_env: str = "development"
