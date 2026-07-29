@@ -37,6 +37,32 @@ class AgentResult(BaseModel):
     errors: list[str] = []
     duration_ms: int
 
+    @classmethod
+    def failed(cls, task: AgentTask, error_msg: str) -> 'AgentResult':
+        return cls(
+            task_id=task.task_id,
+            agent_type=task.agent_type,
+            status=ResultStatus.FAILED,
+            payload={},
+            confidence=0.0,
+            reasoning="Execution failed.",
+            errors=[error_msg],
+            duration_ms=0
+        )
+
+    @classmethod
+    def partial_timeout(cls, task: AgentTask) -> 'AgentResult':
+        return cls(
+            task_id=task.task_id,
+            agent_type=task.agent_type,
+            status=ResultStatus.PARTIAL,
+            payload={},
+            confidence=0.0,
+            reasoning="Execution timed out.",
+            errors=["Timeout exceeded."],
+            duration_ms=0
+        )
+
 class CheckResult(BaseModel):
     passed: bool
     details: Optional[str] = None
@@ -47,13 +73,3 @@ class ReviewResult(BaseModel):
     checks: dict[str, CheckResult]
     feedback: list[str]
     revision_needed: bool
-
-class PlanningState(BaseModel):
-    request: TravelRequest
-    destination_result: Optional[AgentResult] = None
-    logistics_result: Optional[AgentResult] = None
-    budget_result: Optional[AgentResult] = None
-    review_result: Optional[ReviewResult] = None
-    draft_itinerary: Optional[Itinerary] = None
-    revision_count: int = 0
-    status: str = "IN_PROGRESS"

@@ -284,8 +284,9 @@ class Settings(BaseSettings):
 |---|---|---|
 | Implement `DestinationAgent` | `src/agents/destination.py` | Extends `BaseAgent`; uses **Gemini** LLM + Wikivoyage data to recommend activities |
 | Write system prompt | `src/prompts/destination.md` | Dubai expert persona, preference matching, crowd avoidance rules |
-| Integrate Wikivoyage data | `src/agents/destination.py` | Load attractions, restaurants, and districts from `dubai_wikivoyage.json` (scraped from Wikivoyage) |
-| Implement preference matching | `src/agents/destination.py` | Filter activities by user preferences; deprioritize high-crowd items when avoidance is set |
+| Integrate Wikivoyage data | `src/tools/repository.py` | Load and index attractions, restaurants, and districts from `dubai_wikivoyage.json` (scraped from Wikivoyage) |
+| Implement search tool | `src/tools/search.py` | Expose read-only `find_attractions`, `find_restaurants`, `find_districts` using `repository.py` |
+| Implement preference matching | `src/agents/destination.py` | Use `search.py` to filter activities by user preferences; deprioritize high-crowd items when avoidance is set |
 | Unit tests | `tests/test_destination.py` | Verify: food preference → food activities ranked high; "avoid crowds" → high-crowd items filtered |
 
 **Agent output structure:**
@@ -308,8 +309,8 @@ class Settings(BaseSettings):
 |---|---|---|
 | Implement `LogisticsAgent` | `src/agents/logistics.py` | Extends `BaseAgent`; uses **Gemini** LLM + Wikivoyage data to build accommodation plan + daily movement sequences |
 | Write system prompt | `src/prompts/logistics.md` | Practical planner persona, minimize backtracking, realistic timing |
-| Build distance/time tool | `src/tools/distance.py` | Lookup inter-area travel times from Wikivoyage transport data; return duration + mode |
-| Build accommodation tool | `src/tools/pricing.py` | Filter hotels from Wikivoyage Sleep listings by area, budget tier, star rating |
+| Build distance/time tool | `src/tools/distance.py` | District travel-time and feasibility tool; never fabricate precise minutes |
+| Build pricing tool | `src/tools/pricing.py` | Lookup verified accommodation options by area, budget tier, star rating |
 | Day sequencing logic | `src/agents/logistics.py` | Group activities by area per day; minimize transit; respect opening hours |
 | Unit tests | `tests/test_logistics.py` | Verify: 5-day plans have 5 DayPlans; no >45-min transit between consecutive activities |
 
@@ -347,8 +348,8 @@ class Settings(BaseSettings):
 |---|---|---|
 | Implement `BudgetAgent` | `src/agents/budget.py` | Extends `BaseAgent`; uses **Gemini** LLM + Wikivoyage pricing data to calculate category-wise spend, flags overruns |
 | Write system prompt | `src/prompts/budget.md` | Financial advisor persona, conservative estimates, suggest alternatives |
-| Build currency tool | `src/tools/currency.py` | USD ↔ AED conversion using configurable exchange rate |
-| Build pricing tool | `src/tools/pricing.py` | Aggregate costs from Wikivoyage Eat/Sleep/Buy/Budget sections (Budget / Mid-range / Splurge tiers) |
+| Build currency tool | `src/tools/currency.py` | Deterministic USD ↔ AED conversion using configurable exchange rate (3.67) |
+| Build pricing tool | `src/tools/pricing.py` | Aggregate costs from Wikivoyage Eat/Sleep/Buy/Budget sections; return `null` if missing |
 | Budget allocation logic | `src/agents/budget.py` | Default split: Stay 35%, Transport 10%, Food 25%, Activities 30% — adjustable based on preferences |
 | Unit tests | `tests/test_budget.py` | Verify: total ≤ budget → `within_budget=true`; over-budget → warnings + suggestions |
 
@@ -411,144 +412,72 @@ class Settings(BaseSettings):
 
 ---
 
-## Phase 3 — Orchestration & Integration
+## Phase 3 — Orchestration & Integration (Revised)
 
-**Goal:** Wire all agents into the LangGraph state machine, enable parallel execution, implement the review-and-revise loop, and run end-to-end tests.
+This phase integrates our standalone agents from Phase 2 into a complete, end-to-end system using langgraph. Based on the detailed feedback, we will use a **Hybrid DAG** approach.
 
-**Duration:** Week 3
+### 3.1 Proposed Architecture: Hybrid DAG
 
-**Depends on:** Phase 2 (all 5 agents functional)
+`	ext
+START
+  ↓
+parse_request
+  ↓
+┌───────────────┬────────────────┐
+↓               ↓                ↓
+destination   logistics_base   budget_base
+└───────────────┴────────────────┘
+                ↓
+       merge_draft_itinerary
+                ↓
+      enrich_and_recalculate
+          ┌───────────┐
+          ↓           ↓
+   logistics_final  budget_final
+          └─────┬─────┘
+                ↓
+            review
+                ↓
+          revise or END
+`
 
----
-
-### 3.1 LangGraph State Graph
-
-| Task | File | Details |
-|---|---|---|
-| Define graph nodes | `src/agents/orchestrator.py` | `parse_request`, `research`, `logistics`, `budget`, `merge_itinerary`, `review` |
-| Wire edges | `src/agents/orchestrator.py` | Entry → parse → fan-out [research, logistics, budget] → merge → review |
-| Add conditional edge | `src/agents/orchestrator.py` | `review` → `merge_itinerary` (if revision needed & count < 2) OR → `END` |
-| State transitions | `src/agents/orchestrator.py` | Update `PlanningState.status` at each node (PARSING → RESEARCHING → MERGING → REVIEWING → COMPLETE) |
-
-**Graph definition:**
-
-```python
-graph = StateGraph(PlanningState)
-
-graph.add_node("parse_request",    parse_request_node)
-graph.add_node("research",         destination_agent_node)
-graph.add_node("logistics",        logistics_agent_node)
-graph.add_node("budget",           budget_agent_node)
-graph.add_node("merge_itinerary",  merge_itinerary_node)
-graph.add_node("review",           review_agent_node)
-
-graph.set_entry_point("parse_request")
-
-# Fan-out: parse → 3 agents in parallel
-graph.add_edge("parse_request", "research")
-graph.add_edge("parse_request", "logistics")
-graph.add_edge("parse_request", "budget")
-
-# Fan-in: 3 agents → merge
-graph.add_edge(["research", "logistics", "budget"], "merge_itinerary")
-
-# Review gate
-graph.add_edge("merge_itinerary", "review")
-graph.add_conditional_edges("review", should_revise, {
-    True:  "merge_itinerary",
-    False: END
-})
-
-app = graph.compile()
-```
-
----
-
-### 3.2 Parallel Agent Execution
+### 3.2 State Definition
 
 | Task | File | Details |
 |---|---|---|
-| Implement `fan_out()` | `src/agents/orchestrator.py` | Use `asyncio.gather()` to run Destination, Logistics, Budget concurrently |
-| Handle partial failures | `src/agents/orchestrator.py` | `return_exceptions=True`; log failures; proceed with available results |
-| Add timeout | `src/agents/orchestrator.py` | `asyncio.wait_for()` with `AGENT_TIMEOUT_SECONDS` per agent |
+| Define PlanningState | src/models/state.py | TypedDict containing raw_query, parsed_request, branch results, itinerary, revision_count, status, errors, warnings |
+| Define reducers | src/models/state.py | Use operator.add for errors and warnings |
 
-```python
-async def fan_out(state: PlanningState) -> PlanningState:
-    tasks = [
-        asyncio.wait_for(
-            destination_agent.execute(make_task(state, AgentType.DESTINATION)),
-            timeout=settings.agent_timeout_seconds
-        ),
-        asyncio.wait_for(
-            logistics_agent.execute(make_task(state, AgentType.LOGISTICS)),
-            timeout=settings.agent_timeout_seconds
-        ),
-        asyncio.wait_for(
-            budget_agent.execute(make_task(state, AgentType.BUDGET)),
-            timeout=settings.agent_timeout_seconds
-        ),
-    ]
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-    # ... assign to state, handle exceptions
-    return state
-```
-
----
-
-### 3.3 Itinerary Merge Logic
+### 3.3 Failure Handling Wrapper
 
 | Task | File | Details |
 |---|---|---|
-| Implement `merge_itinerary_node` | `src/agents/orchestrator.py` | Combine Destination (activities), Logistics (sequences), Budget (costs) into `Itinerary` |
-| Activity assignment | `src/agents/orchestrator.py` | Place recommended activities into day slots based on logistics sequences |
-| Cost roll-up | `src/agents/orchestrator.py` | Sum per-day costs → total; attach `BudgetBreakdown` |
-| Handle missing data | `src/agents/orchestrator.py` | If an agent failed, fill with placeholder + `status: "partial"` |
+| Implement node wrapper | src/graph.py | Catch timeouts/exceptions, convert to AgentResult with PARTIAL or FAILED status, rather than crashing |
 
----
-
-### 3.4 Review & Revision Loop
+### 3.4 Orchestration Graph
 
 | Task | File | Details |
 |---|---|---|
-| Implement `should_revise()` | `src/agents/orchestrator.py` | Returns `True` if `review_result.revision_needed and revision_count < MAX_REVISION_LOOPS` |
-| Feedback injection | `src/agents/orchestrator.py` | On revision, pass `review_result.feedback` into the merge node context |
-| Revision counter | `src/agents/orchestrator.py` | Increment `state.revision_count` on each loop; hard cap at 2 |
-| Best-effort fallback | `src/agents/orchestrator.py` | If max revisions exceeded, return itinerary with `review_result.approved = False` + warnings |
+| Define State A Nodes | src/graph.py | parse, destination, logistics_base, udget_base |
+| Define Merge Node | src/graph.py | Deterministic combination of activities, day slots, costs, normalizes districts |
+| Define State B Nodes | src/graph.py | logistics_final (validates sequences), udget_final (recalculates costs) |
+| Define Review Node | src/graph.py | Checks final enriched itinerary against constraints |
+| Route Revisions | src/graph.py | Targeted conditional edges based on failure reason (e.g. 
+evise_budget, 
+evise_destination). Cap at 2 revisions. |
 
-**Revision flow:**
-
-```
-Review says "over budget by $200"
-   → revision_count: 0 → 1
-   → Budget Agent re-runs with feedback: "reduce costs by $200"
-   → Merge produces updated itinerary
-   → Review re-checks
-   → If passed: deliver
-   → If still failing & revision_count >= 2: deliver with warnings
-```
-
----
-
-### 3.5 End-to-End Integration Tests
+### 3.5 End-to-End Testing
 
 | Task | File | Details |
 |---|---|---|
-| Happy path test | `tests/test_e2e.py` | Full flow with mocked LLM: query → `Itinerary` with all fields populated |
-| Over-budget test | `tests/test_e2e.py` | Request with $1,000 budget → triggers revision → budget adjusted |
-| Partial failure test | `tests/test_e2e.py` | Destination agent fails → itinerary returned with `status: "partial"` |
-| Timeout test | `tests/test_e2e.py` | Agent exceeds timeout → graceful degradation |
-| Live integration test | `tests/test_e2e_live.py` | Gated behind `--live` flag; uses real Groq + Gemini APIs; validates response schema |
-
----
-
-### Phase 3 — Acceptance Criteria
-
-- [ ] `app.invoke({"raw_query": "..."})` produces a complete `Itinerary` end-to-end
-- [ ] Three agents execute in parallel (verify via timing: total < sum of individual durations)
-- [ ] Review Agent correctly flags an over-budget plan and triggers revision
-- [ ] Revision loop stops at max 2 iterations
-- [ ] Partial failure (1 agent down) still produces a usable itinerary
-- [ ] All E2E tests pass with mocked LLM
+| Parallel barrier test | 	ests/test_e2e.py | Assert merge waits for all branches, including failures |
+| No dependency leakage | 	ests/test_e2e.py | Assert base agents do not receive destination_result |
+| Post-merge feasibility test | 	ests/test_e2e.py | Logistics validation flags impossible transfers |
+| Exact-cost test | 	ests/test_e2e.py | Merged paid activity changes budget estimate |
+| Targeted revision test | 	ests/test_e2e.py | Budget failure reruns Budget/Merge only |
+| Revision cap test | 	ests/test_e2e.py | Stops after 2 loops, outputs partial/warnings |
+| State reducer test | 	ests/test_e2e.py | Warnings from parallel nodes accumulate |
+| Graph snapshot test | 	ests/test_e2e.py | Assert expected node routing |
 
 ---
 
