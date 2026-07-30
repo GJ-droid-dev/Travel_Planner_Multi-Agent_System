@@ -5,6 +5,9 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from asyncio import TimeoutError as AsyncioTimeoutError, timeout
 from datetime import datetime
+from pydantic import ValidationError
+from tenacity import RetryError
+from src.utils.llm import TransientLLMError
 from uuid import uuid4
 
 from src.config import settings
@@ -71,6 +74,39 @@ def create_app() -> FastAPI:
             }
         )
 
+    @app.exception_handler(TransientLLMError)
+    async def transient_llm_exception_handler(request: Request, exc: TransientLLMError):
+        logger.error("llm_service_unavailable", error=str(exc))
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "error": {
+                    "code": "SERVICE_UNAVAILABLE",
+                    "message": "The backend AI service is temporarily unavailable. Please try again later.",
+                    "details": []
+                }
+            }
+        )
+
+    @app.exception_handler(RetryError)
+    async def retry_exception_handler(request: Request, exc: RetryError):
+        # Unwrap the RetryError to see if it's a TransientLLMError
+        original_exc = exc.last_attempt.exception() if exc.last_attempt else None
+        if isinstance(original_exc, TransientLLMError):
+            return await transient_llm_exception_handler(request, original_exc)
+        
+        logger.error("internal_error", error=str(exc))
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": {
+                    "code": "INTERNAL_ERROR",
+                    "message": "An unexpected error occurred.",
+                    "details": []
+                }
+            }
+        )
+
     @app.exception_handler(Exception)
     async def global_exception_handler(request: Request, exc: Exception):
         logger.error("internal_error", error=str(exc))
@@ -128,6 +164,18 @@ def create_app() -> FastAPI:
                     }
                 }
             )
+        except TransientLLMError as e:
+            log.error("llm_service_unavailable", error=str(e))
+            return JSONResponse(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                content={
+                    "error": {
+                        "code": "SERVICE_UNAVAILABLE",
+                        "message": "The underlying LLM service is temporarily unavailable.",
+                        "details": [str(e)]
+                    }
+                }
+            )
             
         # Build PlanResponse based on the final_state
         graph_status = final_state.get("status", "FAILED")
@@ -139,14 +187,27 @@ def create_app() -> FastAPI:
         else:
             response_status = "failed"
             
-        response = PlanResponse(
-            plan_id=plan_id,
-            status=response_status,
-            itinerary=final_state.get("itinerary"),
-            errors=final_state.get("errors", []),
-            warnings=final_state.get("warnings", []),
-            generated_at=datetime.now()
-        )
+        try:
+            response = PlanResponse(
+                plan_id=plan_id,
+                status=response_status,
+                itinerary=final_state.get("itinerary"),
+                errors=final_state.get("errors", []),
+                warnings=final_state.get("warnings", []),
+                generated_at=datetime.now()
+            )
+        except ValidationError as e:
+            log.warning("itinerary_validation_failed", error=str(e))
+            errors = final_state.get("errors", [])
+            errors.append("Draft itinerary failed schema validation.")
+            response = PlanResponse(
+                plan_id=plan_id,
+                status="failed",
+                itinerary=None,
+                errors=errors,
+                warnings=final_state.get("warnings", []),
+                generated_at=datetime.now()
+            )
         
         app_request.app.state.store.save(response)
         log.info("request_completed", status_code=200)

@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional
 
-from src.utils.llm import LLMClient
+from src.utils.llm import LLMClient, TransientLLMError
 from src.models.agent_io import AgentTask, AgentResult, ResultStatus, AgentType
 from src.utils.logger import get_logger
 
@@ -42,6 +42,9 @@ class BaseAgent(ABC):
             result = await self._do_execute(task)
             result.duration_ms = int((time.time() - start_time) * 1000)
             return result
+        except TransientLLMError:
+            # Let this bubble up so the orchestrator/API can handle 503
+            raise
         except Exception as e:
             duration_ms = int((time.time() - start_time) * 1000)
             log.error("agent_execution_failed", error=str(e), duration_ms=duration_ms)

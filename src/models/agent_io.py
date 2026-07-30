@@ -64,12 +64,17 @@ class AgentResult(BaseModel):
         )
 
 class CheckResult(BaseModel):
-    passed: bool
-    details: Optional[str] = None
+    name: str
+    status: str
+    score: float
+    evidence: list[str]
+    issues: list[str]
 
 class ReviewResult(BaseModel):
     approved: bool
     score: float
-    checks: dict[str, CheckResult]
+    checks: list[CheckResult]
     feedback: list[str]
+    critical_issues: list[str] = []
     revision_needed: bool
+    confidence: float = 0.0

@@ -122,44 +122,50 @@ Return valid JSON only. Do not include Markdown, commentary outside JSON, hidden
 {
   "approved": true,
   "score": 0.0,
-  "checks": {
-    "duration_match": {
+  "checks": [
+    {
+      "name": "duration_match",
       "status": "passed | failed | warning | not_applicable",
       "score": 0.0,
       "evidence": ["string"],
       "issues": ["string"]
     },
-    "area_coverage": {
+    {
+      "name": "area_coverage",
       "status": "passed | failed | warning | not_applicable",
       "score": 0.0,
       "evidence": ["string"],
       "issues": ["string"]
     },
-    "budget_compliance": {
+    {
+      "name": "budget_compliance",
       "status": "passed | failed | warning | not_applicable",
       "score": 0.0,
       "evidence": ["string"],
       "issues": ["string"]
     },
-    "preference_alignment": {
+    {
+      "name": "preference_alignment",
       "status": "passed | failed | warning | not_applicable",
       "score": 0.0,
       "evidence": ["string"],
       "issues": ["string"]
     },
-    "avoidance_respected": {
+    {
+      "name": "avoidance_respected",
       "status": "passed | failed | warning | not_applicable",
       "score": 0.0,
       "evidence": ["string"],
       "issues": ["string"]
     },
-    "logistics_feasibility": {
+    {
+      "name": "logistics_feasibility",
       "status": "passed | failed | warning | not_applicable",
       "score": 0.0,
       "evidence": ["string"],
       "issues": ["string"]
     }
-  },
+  ],
   "feedback": ["string"],
   "critical_issues": ["string"],
   "revision_needed": true,

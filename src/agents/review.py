@@ -8,16 +8,21 @@ from src.tools.distance import DistanceTool
 from src.tools.pricing import PricingTool
 
 class CheckResultModel(BaseModel):
-    passed: bool
-    details: str
+    name: str
+    status: str
+    score: float
+    evidence: List[str]
+    issues: List[str]
 
 class ReviewResponse(BaseModel):
     """Pydantic model matching the review.md JSON schema exactly."""
     approved: bool
     score: float
-    checks: Dict[str, CheckResultModel]
+    checks: List[CheckResultModel]
     feedback: List[str]
+    critical_issues: List[str] = Field(default_factory=list)
     revision_needed: bool
+    confidence: float = 0.0
 
 class ReviewAgent(BaseAgent):
     def __init__(self, llm_client):

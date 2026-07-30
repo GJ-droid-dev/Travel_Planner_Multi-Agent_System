@@ -107,7 +107,7 @@ class GeminiClient(LLMClient):
                 raise ValueError("Empty response from Gemini")
                 
             return response_model.model_validate_json(response.text)
-        except google.genai.errors.APIError as e:
+        except genai.errors.APIError as e:
             if e.code in (429, 500, 502, 503, 504):
                 raise TransientLLMError(f"Transient Gemini HTTP {e.code}: {str(e)}") from e
             raise
