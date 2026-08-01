@@ -4,9 +4,7 @@ from typing import Optional, TYPE_CHECKING
 from datetime import date, datetime
 from src.models.request import TravelRequest
 from src.models.budget import BudgetBreakdown
-
-if TYPE_CHECKING:
-    from src.models.agent_io import ReviewResult
+from src.models.agent_io import ReviewResult
 
 class Activity(BaseModel):
     name: str
@@ -42,5 +40,8 @@ class Itinerary(BaseModel):
     days: list[DayPlan]
     accommodation: AccommodationPlan
     budget_breakdown: BudgetBreakdown
-    review_result: 'ReviewResult'
+    review_result: ReviewResult
+    extra_activities: list[Activity] = []
     generated_at: datetime
+
+Itinerary.model_rebuild()

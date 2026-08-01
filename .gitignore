@@ -14,6 +14,9 @@ ENV/
 
 # Secrets
 .env
+.env.local
+.env.test
+.env.production
 
 # Testing
 .pytest_cache/
@@ -22,3 +25,6 @@ htmlcov/
 
 # Scraping cache
 src/data/dubai_wikivoyage.json
+
+# Local SQLite database
+*.db

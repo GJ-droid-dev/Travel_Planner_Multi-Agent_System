@@ -495,9 +495,9 @@ evise_destination). Cap at 2 revisions. |
 
 | Task | File | Details |
 |---|---|---|
-| App factory | `src/main.py` | `create_app()` → FastAPI instance with CORS, lifespan events |
-| Settings injection | `src/main.py` | Load `Settings` at startup; inject into agent constructors |
-| Health endpoint | `src/main.py` | `GET /api/v1/health` → `{"status": "healthy", "gemini_model": "gemini-3.6-flash", "groq_model": "llama-3.3-70b-versatile"}` |
+| App factory | `src/main.py` | `create_app()` → FastAPI instance with CORS, lifespan events (injects store and graph into app.state) |
+| Settings injection | `src/config.py` | Config loaded via `Settings()`; passed to agents during graph execution |
+| Health endpoint | `src/main.py` | `GET /api/v1/health` → `{"status": "healthy", "service": "dubai-ai-travel-planner", "version": "0.1.0"}` |
 
 ---
 
@@ -566,9 +566,9 @@ class PlanResponse(BaseModel):
 
 | Task | File | Details |
 |---|---|---|
-| Request/response logging | `src/main.py` | Log every API call with request ID, duration, status |
-| Agent execution logging | `src/agents/base.py` | Log agent start/end/duration/status with task_id context |
-| Orchestration tracing | `src/agents/orchestrator.py` | Log state transitions: PARSING → RESEARCHING → MERGING → REVIEWING → COMPLETE |
+| Request/response logging | `src/main.py` | Log every API call with request ID and plan ID |
+| Agent execution logging | `src/graph.py` | Log agent start/end/duration/status using `node_wrapper` |
+| Orchestration tracing | `src/graph.py` | Log state transitions throughout the DAG nodes |
 
 **Log format (JSON):**
 
@@ -591,22 +591,22 @@ class PlanResponse(BaseModel):
 
 | Task | File | Details |
 |---|---|---|
-| LLM retry decorator | `src/utils/llm.py` | `tenacity`: 3 attempts, exponential backoff (2s/4s/8s) — applies to both Groq and Gemini clients |
-| Structured output retry | `src/utils/llm.py` | If JSON parsing fails, re-prompt with error + schema |
-| Agent timeout | `src/agents/orchestrator.py` | `asyncio.wait_for` with configurable timeout per agent |
-| Rate limit handling | `src/utils/llm.py` | Catch 429 from Groq/Gemini → respect `Retry-After` → re-queue |
+| LLM retry decorator | `src/utils/llm.py` | `tenacity`: up to 3 attempts, exponential backoff (2s/4s/8s) — applies to Groq and Gemini clients |
+| Structured output retry | `src/utils/llm.py` | Structured output parsing handled by Pydantic; fallback retries happen via tenacity |
+| Agent timeout | `src/graph.py` & `src/main.py` | `asyncio.wait_for` configurable timeout per agent in `node_wrapper`, plus global request timeout in `main.py` |
+| Rate limit handling | `src/utils/llm.py` | TransientLLMError catches 429/503 from LLMs → handled gracefully by global exception handler |
 
 ---
 
 ### Phase 4 — Acceptance Criteria
 
-- [ ] `uvicorn src.main:app` starts the server successfully
-- [ ] `POST /api/v1/plan` with a valid query returns a complete itinerary
-- [ ] `GET /api/v1/plan/{id}` retrieves a previously generated plan
-- [ ] `GET /api/v1/health` returns 200
-- [ ] Invalid requests return structured error JSON (not stack traces)
-- [ ] Logs appear in structured JSON format with agent context
-- [ ] LLM retry succeeds after a simulated transient failure
+- [x] `uvicorn src.main:app` starts the server successfully
+- [x] `POST /api/v1/plan` with a valid query returns a complete itinerary
+- [x] `GET /api/v1/plan/{id}` retrieves a previously generated plan
+- [x] `GET /api/v1/health` returns 200
+- [x] Invalid requests return structured error JSON (not stack traces)
+- [x] Logs appear in structured JSON format with agent context
+- [x] LLM retry succeeds after a simulated transient failure
 
 ---
 

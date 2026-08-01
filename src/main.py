@@ -8,11 +8,12 @@ from datetime import datetime
 from pydantic import ValidationError
 from tenacity import RetryError
 from src.utils.llm import TransientLLMError
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 from src.config import settings
 from src.utils.logger import setup_logging, get_logger
-from src.utils.store import InMemoryPlanStore
+from src.utils.db import engine, AsyncSessionLocal
+from src.utils.store import PostgresPlanStore
 from src.models.api import PlanRequest, PlanResponse
 # Import the compiled graph
 from src.graph import app as graph_app
@@ -25,12 +26,13 @@ async def lifespan(app: FastAPI):
     setup_logging()
     
     # Initialize store and graph
-    app.state.store = InMemoryPlanStore()
+    app.state.store = PostgresPlanStore(AsyncSessionLocal)
     app.state.graph = graph_app
     
     logger.info("app_startup", version="0.1.0", env=settings.app_env)
     yield
     logger.info("app_shutdown")
+    await engine.dispose()
 
 def create_app() -> FastAPI:
     app = FastAPI(
@@ -131,27 +133,40 @@ def create_app() -> FastAPI:
 
     @app.post("/api/v1/plan", response_model=PlanResponse)
     async def create_plan(request: PlanRequest, app_request: Request) -> PlanResponse:
-        if not request.query.strip():
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={"code": "VALIDATION_ERROR", "message": "Query cannot be empty."}
-            )
-        if len(request.query) > 1000:
-            raise HTTPException(
-                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-                detail={"code": "QUERY_TOO_LONG", "message": "Query exceeds 1000 characters."}
-            )
+        base_budget = request.budget_amount
+        if request.budget_scope == "Per traveler":
+            base_budget = base_budget * request.travelers
+            
+        if request.budget_currency == "AED":
+            budget_usd = base_budget / settings.exchange_rate_usd_aed
+        else:
+            budget_usd = base_budget
+
+        from src.models.request import TravelRequest
+        travel_request = TravelRequest(
+            raw_query="", # Deprecated
+            destination=request.destination,
+            duration_days=request.duration_days,
+            budget_usd=budget_usd,
+            include_accommodation=request.include_accommodation,
+            areas=[],
+            preferences=request.interests,
+            avoidances=request.avoidances,
+            travelers=request.travelers,
+            travel_dates=request.travel_dates,
+            extra_notes=request.extra_notes
+        )
             
         request_id = uuid4().hex[:8]
-        plan_id = app_request.app.state.store.new_id()
+        plan_id = uuid4()
         
-        log = logger.bind(request_id=request_id, plan_id=plan_id)
+        log = logger.bind(request_id=request_id, plan_id=str(plan_id))
         log.info("request_started", path="/api/v1/plan")
         log.info("graph_started")
         
         try:
             async with timeout(settings.request_timeout_seconds):
-                final_state = await app_request.app.state.graph.ainvoke({"raw_query": request.query})
+                final_state = await app_request.app.state.graph.ainvoke({"parsed_request": travel_request})
         except AsyncioTimeoutError:
             log.error("planning_timeout")
             return JSONResponse(
@@ -209,14 +224,103 @@ def create_app() -> FastAPI:
                 generated_at=datetime.now()
             )
         
-        app_request.app.state.store.save(response)
+        await app_request.app.state.store.save(response)
         log.info("request_completed", status_code=200)
         
         return response
 
+    @app.post("/api/v1/plan/stream")
+    async def stream_plan(request: PlanRequest, app_request: Request):
+        import json
+        from fastapi.responses import StreamingResponse
+        from src.models.request import TravelRequest
+        
+        base_budget = request.budget_amount
+        if request.budget_scope == "Per traveler":
+            base_budget = base_budget * request.travelers
+            
+        if request.budget_currency == "AED":
+            budget_usd = base_budget / settings.exchange_rate_usd_aed
+        else:
+            budget_usd = base_budget
+
+        travel_request = TravelRequest(
+            raw_query="", 
+            destination=request.destination,
+            duration_days=request.duration_days,
+            budget_usd=budget_usd,
+            include_accommodation=request.include_accommodation,
+            areas=[],
+            preferences=request.interests,
+            avoidances=request.avoidances,
+            travelers=request.travelers,
+            travel_dates=request.travel_dates,
+            extra_notes=request.extra_notes
+        )
+            
+        request_id = uuid4().hex[:8]
+        plan_id = uuid4()
+        
+        log = logger.bind(request_id=request_id, plan_id=str(plan_id))
+        log.info("stream_request_started", path="/api/v1/plan/stream")
+        
+        async def event_generator():
+            final_state = {}
+            try:
+                async for chunk in app_request.app.state.graph.astream({"parsed_request": travel_request}, stream_mode="updates"):
+                    node_name = list(chunk.keys())[0] if chunk else ""
+                    yield f"data: {json.dumps({'node': node_name})}\n\n"
+                    
+                    if chunk and isinstance(chunk, dict):
+                        for v in chunk.values():
+                            if isinstance(v, dict):
+                                for key, val in v.items():
+                                    if key in ("errors", "warnings", "revision_feedback"):
+                                        final_state.setdefault(key, []).extend(val)
+                                    else:
+                                        final_state[key] = val
+            except Exception as e:
+                log.error("stream_error", error=str(e))
+                yield f"data: {json.dumps({'error': str(e)})}\n\n"
+                return
+                
+            graph_status = final_state.get("status", "FAILED")
+            if graph_status == "COMPLETE":
+                response_status = "completed"
+            elif graph_status in ("PARTIAL", "REVIEWING", "VALIDATING"):
+                response_status = "partial"
+            else:
+                response_status = "failed"
+                
+            try:
+                response = PlanResponse(
+                    plan_id=plan_id,
+                    status=response_status,
+                    itinerary=final_state.get("itinerary"),
+                    errors=final_state.get("errors", []),
+                    warnings=final_state.get("warnings", []),
+                    generated_at=datetime.now()
+                )
+            except ValidationError as e:
+                errors = final_state.get("errors", [])
+                errors.append("Draft itinerary failed schema validation.")
+                response = PlanResponse(
+                    plan_id=plan_id,
+                    status="failed",
+                    itinerary=None,
+                    errors=errors,
+                    warnings=final_state.get("warnings", []),
+                    generated_at=datetime.now()
+                )
+                
+            await app_request.app.state.store.save(response)
+            yield f"data: {json.dumps({'done': True, 'plan_id': str(plan_id)})}\n\n"
+            
+        return StreamingResponse(event_generator(), media_type="text/event-stream")
+
     @app.get("/api/v1/plan/{plan_id}", response_model=PlanResponse)
-    async def get_plan(plan_id: str, app_request: Request) -> PlanResponse:
-        plan = app_request.app.state.store.get(plan_id)
+    async def get_plan(plan_id: UUID, app_request: Request) -> PlanResponse:
+        plan = await app_request.app.state.store.get(plan_id)
         if not plan:
             return JSONResponse(
                 status_code=status.HTTP_404_NOT_FOUND,

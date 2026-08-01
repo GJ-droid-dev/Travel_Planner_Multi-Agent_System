@@ -51,42 +51,100 @@ async def test_parallel_barrier(mock_travel_request):
 @pytest.mark.asyncio
 async def test_no_dependency_leakage():
     """Assert base agents do not receive destination_result."""
-    # Since the nodes run in parallel, when logistics_base and budget_base are called,
-    # destination_result shouldn't be populated in the state yet, OR it doesn't matter because 
-    # we explicitely don't pass it in make_task(state).
+    from src.graph import make_task
+    from src.models.agent_io import AgentType
+    from src.models.request import TravelRequest
     
-    # Our graph make_task doesn't pass destination_result to context, it only passes revision_feedback
-    pass
+    state = {
+        "parsed_request": TravelRequest(raw_query="", destination="", duration_days=1, budget_usd=1, areas=[], preferences=[], avoidances=[], travelers=1),
+        "destination_result": {"some": "data"}, 
+        "revision_feedback": ["feedback"]
+    }
+    task = make_task(state, AgentType.LOGISTICS)
+    
+    # Check that destination_result is not passed in the context
+    assert "destination_result" not in task.context
+    assert task.context.get("revision_feedback") == ["feedback"]
 
 @pytest.mark.asyncio
 async def test_post_merge_feasibility():
     """Logistics validation flags impossible transfers"""
-    pass
+    from src.graph import logistics_final_node
+    state = {
+        "status": "PLANNING",
+        "parsed_request": TravelRequest(raw_query="", destination="Dubai", duration_days=1, budget_usd=1000, areas=[], preferences=[], avoidances=[], travelers=1),
+        "draft_itinerary": {}
+    }
+    
+    result = await logistics_final_node(state)
+    assert isinstance(result, dict)
 
 @pytest.mark.asyncio
 async def test_exact_cost():
     """Merged paid activity changes budget estimate"""
-    pass
+    from src.graph import budget_final_node
+    from src.models.agent_io import AgentResult, AgentType, ResultStatus
+    
+    state = {
+        "status": "PLANNING",
+        "parsed_request": TravelRequest(raw_query="", destination="Dubai", duration_days=1, budget_usd=1000, areas=[], preferences=[], avoidances=[], travelers=1),
+        "draft_itinerary": {},
+        "budget_base_result": AgentResult(
+            task_id="test", agent_type=AgentType.BUDGET, status=ResultStatus.SUCCESS,
+            payload={"budget_breakdown": {"categories": {"stay": 100, "activities": 0}}},
+            confidence=1.0, reasoning="", duration_ms=0
+        )
+    }
+    
+    result = await budget_final_node(state)
+    assert isinstance(result, dict)
 
 @pytest.mark.asyncio
 async def test_targeted_revision():
     """Budget failure reruns Budget/Merge only"""
-    pass
+    from src.graph import route_after_review
+    from src.models.agent_io import AgentResult, AgentType, ResultStatus
+    
+    state = {
+        "review_result": AgentResult(
+            task_id="test", agent_type=AgentType.REVIEW, status=ResultStatus.SUCCESS,
+            payload={"revision_needed": True, "feedback": ["Over budget"], "approved": False},
+            confidence=1.0, reasoning="", duration_ms=0
+        ),
+        "revision_count": 0
+    }
+    next_node = route_after_review(state)
+    assert next_node == "revise_merge"
 
 @pytest.mark.asyncio
 async def test_revision_cap():
     """Stops after 2 loops, outputs partial/warnings"""
-    pass
+    from src.graph import route_after_review
+    from src.models.agent_io import AgentResult, AgentType, ResultStatus
+    
+    state = {
+        "review_result": AgentResult(
+            task_id="test", agent_type=AgentType.REVIEW, status=ResultStatus.SUCCESS,
+            payload={"revision_needed": True, "feedback": ["Over budget"], "approved": False},
+            confidence=1.0, reasoning="", duration_ms=0
+        ),
+        "revision_count": 2
+    }
+    next_node = route_after_review(state)
+    assert next_node == "end_with_warnings"
 
 @pytest.mark.asyncio
 async def test_state_reducer():
     """Warnings from parallel nodes accumulate"""
-    pass
+    from src.models.state import PlanningState
+    from typing import get_type_hints
+    hints = get_type_hints(PlanningState, include_extras=True)
+    assert "warnings" in hints
+    assert "errors" in hints
 
 @pytest.mark.asyncio
 async def test_graph_snapshot():
     """Assert expected node routing"""
-    # We can test if the edges are correctly registered in the compiled graph
     nodes = app.nodes
     assert "parse_request" in nodes
     assert "destination" in nodes

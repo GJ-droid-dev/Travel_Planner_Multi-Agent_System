@@ -1,4 +1,4 @@
-from pydantic import SecretStr
+from pydantic import SecretStr, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
@@ -22,6 +22,20 @@ class Settings(BaseSettings):
     app_env: str = "development"
     app_port: int = 8000
     log_level: str = "INFO"
+    database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/travel_planner"
+
+    @field_validator("database_url")
+    @classmethod
+    def to_async_database_url(cls, url: str) -> str:
+        url = url.replace("sslmode=require", "ssl=require")
+        url = url.replace("&channel_binding=require", "").replace("?channel_binding=require", "")
+        if url.startswith("postgresql+asyncpg://"):
+            return url
+        if url.startswith("postgres://"):
+            return url.replace("postgres://", "postgresql+asyncpg://", 1)
+        if url.startswith("postgresql://"):
+            return url.replace("postgresql://", "postgresql+asyncpg://", 1)
+        raise ValueError("DATABASE_URL must be a PostgreSQL connection URL")
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
 

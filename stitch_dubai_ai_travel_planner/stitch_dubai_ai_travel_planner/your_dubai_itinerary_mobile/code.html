@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dubai AI Travel Planner - Your Itinerary</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#735c00",
+                    "tertiary-container": "#cba72f",
+                    "on-primary-container": "#7c839f",
+                    "surface-container": "#efeeea",
+                    "surface-container-low": "#f4f4f0",
+                    "surface-container-high": "#e9e8e4",
+                    "surface": "#faf9f5",
+                    "on-primary-fixed": "#141a32",
+                    "secondary": "#006972",
+                    "on-tertiary-fixed": "#241a00",
+                    "tertiary-fixed-dim": "#e9c349",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#3f465f",
+                    "inverse-primary": "#bfc5e4",
+                    "surface-bright": "#faf9f5",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#4e3d00",
+                    "on-tertiary-fixed-variant": "#574500",
+                    "secondary-fixed": "#9ff0fb",
+                    "primary": "#000000",
+                    "surface-dim": "#dbdad6",
+                    "surface-variant": "#e3e2df",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c6c6ce",
+                    "secondary-fixed-dim": "#82d3de",
+                    "primary-fixed": "#dce1ff",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#9ff0fb",
+                    "tertiary-fixed": "#ffe088",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2f312e",
+                    "on-secondary-fixed-variant": "#004f56",
+                    "on-surface": "#1b1c1a",
+                    "on-background": "#1b1c1a",
+                    "surface-container-highest": "#e3e2df",
+                    "on-secondary-container": "#066f79",
+                    "primary-container": "#141a32",
+                    "surface-tint": "#575d78",
+                    "on-secondary-fixed": "#001f23",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#bfc5e4",
+                    "background": "#faf9f5",
+                    "error-container": "#ffdad6",
+                    "outline": "#76767e",
+                    "on-surface-variant": "#46464d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "margin-desktop": "64px",
+                    "margin-mobile": "20px",
+                    "stack-lg": "48px",
+                    "stack-md": "24px",
+                    "unit": "8px",
+                    "stack-sm": "12px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "display-lg-mobile": ["Montserrat"],
+                    "headline-lg": ["Montserrat"],
+                    "body-lg": ["Inter"],
+                    "caption": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .desert-shadow {
+            box-shadow: 0px 4px 20px rgba(10, 17, 40, 0.04);
+        }
+        .timeline-thread::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #006972;
+            opacity: 0.3;
+        }
+        .glass-effect {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.8);
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .active .collapsible-content {
+            max-height: 1000px;
+        }
+        .active .chevron-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-32">
+<!-- TopNavBar - Fixed Mobile Shell -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile py-4 bg-surface/80 backdrop-blur-md shadow-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Dubai AI</h1>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant">search</button>
+<div class="w-8 h-8 rounded-full bg-secondary text-white flex items-center justify-center font-label-md">JD</div>
+</div>
+</header>
+<main class="pt-24 px-margin-mobile space-y-stack-md">
+<!-- Welcome Hero Section -->
+<section class="space-y-unit">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-primary">Your Oasis Plan</h2>
+<p class="font-body-md text-on-surface-variant">5 Days in Dubai · Premium Tier · Active Lifestyle</p>
+</section>
+<!-- Simplified Budget Dashboard (Bento Style) -->
+<section class="grid grid-cols-2 gap-4">
+<div class="col-span-2 bg-surface-container-lowest p-4 rounded-xl desert-shadow border border-outline-variant/10">
+<div class="flex justify-between items-end mb-2">
+<span class="font-label-md text-on-surface-variant uppercase tracking-wider">Total Budget</span>
+<span class="font-headline-md text-primary">$4,250</span>
+</div>
+<div class="h-2 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-secondary w-3/4 rounded-full"></div>
+</div>
+<div class="flex justify-between mt-2 font-caption text-on-surface-variant">
+<span>Used: $3,180</span>
+<span>Remaining: $1,070</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl desert-shadow border border-outline-variant/10 flex flex-col gap-1">
+<span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">flight</span>
+<span class="font-label-md text-on-surface-variant">Transport</span>
+<span class="font-headline-md text-primary">$840</span>
+</div>
+<div class="bg-surface-container-lowest p-4 rounded-xl desert-shadow border border-outline-variant/10 flex flex-col gap-1">
+<span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">hotel</span>
+<span class="font-label-md text-on-surface-variant">Stay</span>
+<span class="font-headline-md text-primary">$1,200</span>
+</div>
+</section>
+<!-- Itinerary Sections -->
+<section class="space-y-4">
+<!-- Day 1 (Expanded by default) -->
+<div class="itinerary-day active bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden desert-shadow" onclick="this.classList.toggle('active')">
+<div class="p-4 flex justify-between items-center bg-surface-container-low cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-headline-md">1</span>
+<div>
+<p class="font-label-md text-primary">Day 1: Arrival &amp; Heights</p>
+<p class="font-caption text-on-surface-variant">Downtown Dubai · 3 Activities</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant chevron-icon transition-transform">expand_more</span>
+</div>
+<div class="collapsible-content">
+<div class="p-4 space-y-6 relative timeline-thread">
+<!-- Activity 1 -->
+<div class="relative pl-8 space-y-3">
+<div class="absolute left-[8px] top-1 w-2 h-2 rounded-full bg-secondary ring-4 ring-secondary/20"></div>
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-primary">Private Transfer to Hotel</h4>
+<span class="font-caption px-2 py-1 bg-surface-variant rounded text-on-surface-variant">09:00 AM</span>
+</div>
+<div class="aspect-video w-full rounded-lg overflow-hidden bg-surface-variant">
+<img class="w-full h-full object-cover" data-alt="A luxury black SUV chauffeur service arriving at a modern architectural masterpiece hotel in Dubai, soft morning light hitting the glass facade, high-end travel photography style, neutral tones with deep navy accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAyZUtByth2tA6HdtLfgW07ko2C_Kq3VK0iWUUMRIq6gxy6VlIIWQwy-V_LyORYqtDh0kb75FWUXd01FFofZ-PVervzKlf-SmuSySOdk31bV_SpbQokEfQioUcAHLCryOlLeYfZvckn0eE-NciYSirmins9lGAhUWytaDrxTLcb8i29QUsPx662E1J741eIIQJCI9kXs4znj1NSP6B_xaAfCcNjYm9MOfMlZmUq2B-8QIceWUHUojsV"/>
+</div>
+<p class="text-caption text-on-surface-variant">Your chauffeur will meet you at Terminal 3 with a nameplate.</p>
+</div>
+<!-- Activity 2 -->
+<div class="relative pl-8 space-y-3">
+<div class="absolute left-[8px] top-1 w-2 h-2 rounded-full bg-secondary ring-4 ring-secondary/20"></div>
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-primary">Burj Khalifa Observation Deck</h4>
+<span class="font-caption px-2 py-1 bg-surface-variant rounded text-on-surface-variant">02:00 PM</span>
+</div>
+<p class="text-caption text-on-surface-variant">Pre-booked "At the Top Sky" tickets for level 148. Fast-track entry included.</p>
+<div class="flex gap-2">
+<span class="px-2 py-1 rounded-full bg-tertiary-fixed text-on-tertiary-fixed font-caption">Must See</span>
+<span class="px-2 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-caption">$150/pp</span>
+</div>
+</div>
+<!-- Activity 3 -->
+<div class="relative pl-8 space-y-3">
+<div class="absolute left-[8px] top-1 w-2 h-2 rounded-full bg-secondary ring-4 ring-secondary/20"></div>
+<div class="flex justify-between items-start">
+<h4 class="font-label-md text-primary">Dubai Fountain Dinner</h4>
+<span class="font-caption px-2 py-1 bg-surface-variant rounded text-on-surface-variant">07:30 PM</span>
+</div>
+<p class="text-caption text-on-surface-variant">Terrace seating at Thiptara with a front-row view of the fountain show.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Day 2 (Collapsed) -->
+<div class="itinerary-day bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden desert-shadow" onclick="this.classList.toggle('active')">
+<div class="p-4 flex justify-between items-center bg-surface-container-low cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-full border-2 border-outline text-outline flex items-center justify-center font-headline-md">2</span>
+<div>
+<p class="font-label-md text-primary">Day 2: Desert Adventure</p>
+<p class="font-caption text-on-surface-variant">Lahbab Desert · 4 Activities</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant chevron-icon transition-transform">expand_more</span>
+</div>
+<div class="collapsible-content">
+<div class="p-4 text-on-surface-variant font-body-md">
+                        Loading your bespoke desert experience...
+                    </div>
+</div>
+</div>
+<!-- Day 3 (Collapsed) -->
+<div class="itinerary-day bg-surface-container-lowest rounded-xl border border-outline-variant/20 overflow-hidden desert-shadow" onclick="this.classList.toggle('active')">
+<div class="p-4 flex justify-between items-center bg-surface-container-low cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="w-10 h-10 rounded-full border-2 border-outline text-outline flex items-center justify-center font-headline-md">3</span>
+<div>
+<p class="font-label-md text-primary">Day 3: Old Dubai Heritage</p>
+<p class="font-caption text-on-surface-variant">Al Fahidi &amp; Souks · 3 Activities</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant chevron-icon transition-transform">expand_more</span>
+</div>
+<div class="collapsible-content">
+<div class="p-4 text-on-surface-variant font-body-md">
+                        Historical walks and cultural dining details.
+                    </div>
+</div>
+</div>
+</section>
+<!-- CTA Floating Task -->
+<div class="pt-8 pb-12 flex flex-col gap-4">
+<button class="w-full py-4 bg-primary text-on-primary rounded-xl font-label-md flex items-center justify-center gap-2 desert-shadow active:scale-95 transition-all">
+<span class="material-symbols-outlined">save</span>
+                Finalize &amp; Book Itinerary
+            </button>
+<button class="w-full py-4 border border-secondary text-secondary rounded-xl font-label-md flex items-center justify-center gap-2 active:scale-95 transition-all">
+<span class="material-symbols-outlined">edit</span>
+                Modify Interests
+            </button>
+</div>
+</main>
+<!-- BottomNavBar - Mobile Fixed -->
+<nav class="fixed bottom-0 w-full bg-surface-container-lowest border-t border-outline-variant/30 flex justify-around items-center py-3 z-50 md:hidden">
+<div class="flex flex-col items-center gap-1 text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-[10px]">Dashboard</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-md text-[10px]">Itineraries</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-[10px]">Budget</span>
+</div>
+<div class="flex flex-col items-center gap-1 text-on-surface-variant opacity-60">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-[10px]">Settings</span>
+</div>
+</nav>
+<!-- Footer - Simplified for Results Screen -->
+<footer class="w-full py-8 px-margin-mobile flex flex-col items-center gap-4 border-t border-outline-variant bg-surface-container-lowest">
+<p class="font-label-md text-primary font-bold">Dubai AI Travel Planner</p>
+<p class="font-caption text-on-surface-variant text-center">© 2024. Plan generated by multi-agent AI based on luxury travel trends.</p>
+<div class="flex gap-4 text-on-surface-variant font-caption">
+<span>Privacy</span>
+<span>Terms</span>
+<span class="text-secondary font-bold">Online</span>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for active state tracking
+        document.querySelectorAll('.itinerary-day').forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove active from others if desired, or keep as multi-expand
+                // document.querySelectorAll('.itinerary-day').forEach(c => { if(c !== card) c.classList.remove('active'); });
+            });
+        });
+    </script>
+</body></html>

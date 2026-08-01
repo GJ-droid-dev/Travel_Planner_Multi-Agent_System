@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dubai AI Travel Planner</title>
+<!-- Tailwind CSS with Plugins -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#735c00",
+                    "tertiary-container": "#cba72f",
+                    "on-primary-container": "#7c839f",
+                    "surface-container": "#efeeea",
+                    "surface-container-low": "#f4f4f0",
+                    "surface-container-high": "#e9e8e4",
+                    "surface": "#faf9f5",
+                    "on-primary-fixed": "#141a32",
+                    "secondary": "#006972",
+                    "on-tertiary-fixed": "#241a00",
+                    "tertiary-fixed-dim": "#e9c349",
+                    "on-primary": "#ffffff",
+                    "on-primary-fixed-variant": "#3f465f",
+                    "inverse-primary": "#bfc5e4",
+                    "surface-bright": "#faf9f5",
+                    "on-tertiary": "#ffffff",
+                    "on-tertiary-container": "#4e3d00",
+                    "on-tertiary-fixed-variant": "#574500",
+                    "secondary-fixed": "#9ff0fb",
+                    "primary": "#000000",
+                    "surface-dim": "#dbdad6",
+                    "surface-variant": "#e3e2df",
+                    "error": "#ba1a1a",
+                    "outline-variant": "#c6c6ce",
+                    "secondary-fixed-dim": "#82d3de",
+                    "primary-fixed": "#dce1ff",
+                    "on-error": "#ffffff",
+                    "secondary-container": "#9ff0fb",
+                    "tertiary-fixed": "#ffe088",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#2f312e",
+                    "on-secondary-fixed-variant": "#004f56",
+                    "on-surface": "#1b1c1a",
+                    "on-background": "#1b1c1a",
+                    "surface-container-highest": "#e3e2df",
+                    "on-secondary-container": "#066f79",
+                    "primary-container": "#141a32",
+                    "surface-tint": "#575d78",
+                    "on-secondary-fixed": "#001f23",
+                    "on-secondary": "#ffffff",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-error-container": "#93000a",
+                    "primary-fixed-dim": "#bfc5e4",
+                    "background": "#faf9f5",
+                    "error-container": "#ffdad6",
+                    "outline": "#76767e",
+                    "on-surface-variant": "#46464d"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1280px",
+                    "margin-desktop": "64px",
+                    "margin-mobile": "20px",
+                    "stack-lg": "48px",
+                    "stack-md": "24px",
+                    "unit": "8px",
+                    "stack-sm": "12px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Montserrat"],
+                    "headline-md": ["Montserrat"],
+                    "display-lg-mobile": ["Montserrat"],
+                    "headline-lg": ["Montserrat"],
+                    "body-lg": ["Inter"],
+                    "caption": ["Inter"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                    "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                    "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                    "display-lg-mobile": ["36px", { "lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                    "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "600" }],
+                    "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                    "caption": ["12px", { "lineHeight": "16px", "fontWeight": "400" }]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Smooth Scrolling */
+        html { scroll-behavior: smooth; }
+
+        /* Custom Desert Oasis Shadow */
+        .shadow-desert {
+            box-shadow: 0px 4px 20px rgba(10, 17, 40, 0.04);
+        }
+
+        /* Hide Scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Timeline Connector */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            left: 1.25rem;
+            top: 2rem;
+            bottom: 0;
+            width: 2px;
+            background-color: #006972; /* Secondary/Teal */
+            opacity: 0.2;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md selection:bg-secondary-fixed-dim">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 bg-surface/80 backdrop-blur-md shadow-sm">
+<div class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">
+            Dubai AI Travel Planner
+        </div>
+<!-- Mobile Hidden Navigation Links (Web only per Shared Component Logic) -->
+<div class="hidden md:flex gap-6 items-center">
+<a class="text-secondary dark:text-secondary-fixed border-b-2 border-secondary dark:border-secondary-fixed pb-1 font-label-md text-label-md" href="#">Plan a Trip</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-opacity font-label-md text-label-md" href="#">Retrieve Plan</a>
+<a class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-opacity font-label-md text-label-md" href="#">How It Works</a>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-80 active:scale-95 duration-150">
+                Multi-Agent AI
+            </button>
+</div>
+<!-- Mobile Menu Trigger -->
+<button class="md:hidden p-2 text-on-surface">
+<span class="material-symbols-outlined">menu</span>
+</button>
+</nav>
+<!-- Hero Content & Plan Trip Canvas -->
+<main class="pt-24 pb-32 px-margin-mobile">
+<!-- Hero Header -->
+<header class="mb-stack-lg">
+<h1 class="font-display-lg-mobile text-display-lg-mobile text-primary mb-4">
+                Your Dubai Oasis, <br/>
+<span class="text-secondary">Designed by AI.</span>
+</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-sm">
+                Experience ultra-personalized itineraries curated by multiple AI agents specialized in luxury, logistics, and hidden gems.
+            </p>
+</header>
+<!-- Planning Form (Card UI) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-desert p-6 border border-outline-variant/10">
+<div class="flex items-center gap-2 mb-stack-md text-secondary">
+<span class="material-symbols-outlined">auto_awesome</span>
+<h2 class="font-headline-md text-headline-md">Start Planning</h2>
+</div>
+<!-- Input Fields with Floating Label Style Logic -->
+<div class="space-y-gutter">
+<div class="relative">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">Where do you want to start?</label>
+<div class="flex items-center gap-3 bg-surface border border-outline/20 rounded-lg p-4 focus-within:border-secondary transition-all">
+<span class="material-symbols-outlined text-outline">location_on</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md placeholder:text-outline-variant" placeholder="e.g. Downtown Dubai, Palm Jumeirah" type="text"/>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="relative">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">Arrival</label>
+<div class="flex items-center gap-3 bg-surface border border-outline/20 rounded-lg p-4 focus-within:border-secondary transition-all">
+<span class="material-symbols-outlined text-outline">calendar_today</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md" placeholder="Oct 12" type="text"/>
+</div>
+</div>
+<div class="relative">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">Days</label>
+<div class="flex items-center gap-3 bg-surface border border-outline/20 rounded-lg p-4 focus-within:border-secondary transition-all">
+<span class="material-symbols-outlined text-outline">schedule</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-body-md" type="number" value="5"/>
+</div>
+</div>
+</div>
+<div class="relative">
+<label class="block font-label-md text-label-md text-on-surface-variant mb-2">What's your vibe?</label>
+<div class="flex gap-2 overflow-x-auto no-scrollbar pb-2">
+<button class="flex-shrink-0 px-4 py-2 rounded-full border border-secondary bg-secondary-container text-on-secondary-container font-label-md text-label-md">Luxury</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md text-label-md">Adventure</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md text-label-md">Family</button>
+<button class="flex-shrink-0 px-4 py-2 rounded-full border border-outline-variant text-on-surface-variant font-label-md text-label-md">Culture</button>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-5 rounded-lg font-headline-md text-headline-md shadow-md active:scale-95 transition-transform flex items-center justify-center gap-2">
+<span>Generate Itinerary</span>
+<span class="material-symbols-outlined">rocket_launch</span>
+</button>
+</div>
+</section>
+<!-- How It Works (Stacked Vertical Timeline) -->
+<section class="mt-stack-lg relative">
+<div class="flex items-center justify-between mb-8">
+<h3 class="font-headline-lg text-headline-lg text-primary">How It Works</h3>
+<span class="text-tertiary-container material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">info</span>
+</div>
+<div class="space-y-stack-lg relative timeline-line">
+<!-- Step 1 -->
+<div class="flex gap-stack-md relative">
+<div class="z-10 bg-secondary text-on-secondary w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm">edit_note</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md mb-1">Define Interests</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Tell us what you love—from desert safaris to high-end Michelin dining.</p>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex gap-stack-md relative">
+<div class="z-10 bg-surface-container-highest text-secondary w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border-2 border-secondary">
+<span class="material-symbols-outlined text-sm">hub</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md mb-1">Multi-Agent Sync</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Specialized AI agents collaborate to optimize routes, booking times, and budget.</p>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="flex gap-stack-md relative">
+<div class="z-10 bg-surface-container-highest text-on-surface-variant w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border border-outline-variant">
+<span class="material-symbols-outlined text-sm">map</span>
+</div>
+<div>
+<h4 class="font-headline-md text-headline-md mb-1">Instant Plan</h4>
+<p class="font-body-md text-body-md text-on-surface-variant">Receive a ready-to-go interactive map with all reservations and insights.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Destination Cards (Horizontal Scroll for Landmarks) -->
+<section class="mt-stack-lg">
+<h3 class="font-headline-lg text-headline-lg text-primary mb-6">Trending Dubai</h3>
+<div class="flex gap-gutter overflow-x-auto no-scrollbar -mx-margin-mobile px-margin-mobile">
+<div class="min-w-[280px] bg-white rounded-xl shadow-desert overflow-hidden border border-outline-variant/10">
+<div class="h-48 w-full bg-surface-dim relative" data-alt="A cinematic, high-resolution photograph of the Burj Khalifa at twilight. The sky is a gradient of deep indigo and soft orange. The modern architecture reflects the city lights. The aesthetic is clean, luxurious, and authoritative, matching a premium travel brand palette of navy and sand." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC6QYAFG4gAdl7gGVjQVkjBZiWur_XZzSziKqydXno0NHfKnnDRg2R4yUfW0wJPytsX4bQoRoyLV9Jd6iVdtYbLQiAoHELHTBkBg5fQnTX6X7tiBPz1-dlXng05dU0katSAI2EHTmYtEVcNgPZCNA4aWZ3F-XDAYeuoatPruRdljiwPnjxy_zJm5e5o0rKIfsy_J7ilQJz-LHr14aMpDimvLYegM1UT6sbWaOcPOsqyt6TPvbG-5_Ik')"></div>
+<div class="p-4">
+<span class="text-tertiary font-label-md text-label-md uppercase tracking-wider">Luxury</span>
+<h5 class="font-headline-md text-headline-md mt-1">Burj Khalifa District</h5>
+<div class="mt-4 flex justify-between items-center">
+<span class="flex items-center gap-1 text-on-surface-variant text-caption font-caption">
+<span class="material-symbols-outlined text-sm text-tertiary">star</span> 4.9 (2k+)
+                            </span>
+<button class="text-secondary font-label-md text-label-md flex items-center gap-1">
+                                Explore <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+<div class="min-w-[280px] bg-white rounded-xl shadow-desert overflow-hidden border border-outline-variant/10">
+<div class="h-48 w-full bg-surface-dim relative" data-alt="A wide-angle, vibrant shot of a desert safari at golden hour in Dubai. Red sand dunes ripple under a warm setting sun. A luxury 4x4 vehicle is parked near a stylish Arabian tent. The lighting is soft and warm, evoking a sense of calm confidence and high-end adventure." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDySjyTdGmqp9OlsTeaCQVnIUgD3OqTqFIZgUpEOhKWOOJeIyNFq1JyXjGS5fPc1F0nKaqOtCfEaDU1XiQsSwVcrXwSIuyaFwiQe3z4TK6-E8qzKu3pbYJnd_cl7dBCw3e5GSVXHZ-8r7A73nCK2D5Bb5Gb64uk_WVN2BxGGCoDKOAYYw-FdKP7zdc2QgSW1oilrIi960kXgoqBMcf9LRgpV36fBKenFdXLKCEy4PCwg-q2T_SQZfA8')"></div>
+<div class="p-4">
+<span class="text-secondary font-label-md text-label-md uppercase tracking-wider">Adventure</span>
+<h5 class="font-headline-md text-headline-md mt-1">Al Marmoom Desert</h5>
+<div class="mt-4 flex justify-between items-center">
+<span class="flex items-center gap-1 text-on-surface-variant text-caption font-caption">
+<span class="material-symbols-outlined text-sm text-tertiary">star</span> 4.8 (800+)
+                            </span>
+<button class="text-secondary font-label-md text-label-md flex items-center gap-1">
+                                Explore <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Bar (Mobile Destination Rule) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface shadow-[0_-4px_10px_rgba(0,0,0,0.05)] flex items-center justify-around py-3 px-4">
+<a class="flex flex-col items-center gap-1 text-secondary" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
+<span class="font-label-md text-[10px]">Plan</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">map</span>
+<span class="font-label-md text-[10px]">Itineraries</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-label-md text-[10px]">Budget</span>
+</a>
+<a class="flex flex-col items-center gap-1 text-on-surface-variant" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label-md text-[10px]">Settings</span>
+</a>
+</nav>
+<!-- Footer (Shared Component) -->
+<footer class="w-full py-8 px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-lowest border-t border-outline-variant mb-16 md:mb-0">
+<div class="font-label-md text-label-md font-bold text-primary">Dubai AI Travel Planner</div>
+<div class="flex flex-wrap justify-center gap-4">
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary underline transition-all" href="#">Service Status: Online</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="font-caption text-caption text-on-surface-variant hover:text-primary underline transition-all" href="#">Terms of Service</a>
+</div>
+<div class="font-caption text-caption text-on-surface-variant">
+            © 2024 Dubai AI Travel Planner. All rights reserved.
+        </div>
+</footer>
+<!-- Micro-interactions Script -->
+<script>
+        // Simple input focus state animation enhancement
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                input.parentElement.classList.add('shadow-md');
+            });
+            input.addEventListener('blur', () => {
+                input.parentElement.classList.remove('shadow-md');
+            });
+        });
+
+        // Sticky nav shadow on scroll
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body></html>

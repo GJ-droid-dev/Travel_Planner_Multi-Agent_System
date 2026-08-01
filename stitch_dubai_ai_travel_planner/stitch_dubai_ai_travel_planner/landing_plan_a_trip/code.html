@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+
+<html class="scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dubai AI Travel Planner | Modern Oasis</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .fill-icon {
+            font-variation-settings: 'FILL' 1;
+        }
+        .desert-noon-shadow {
+            box-shadow: 0px 4px 20px rgba(10, 17, 40, 0.04);
+        }
+        .timeline-gradient {
+            background: linear-gradient(to bottom, #006972 0%, #cba72f 100%);
+        }
+        .hero-gradient {
+            background: linear-gradient(135deg, #faf9f5 0%, #efeeea 100%);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#735c00",
+                        "tertiary-container": "#cba72f",
+                        "on-primary-container": "#7c839f",
+                        "surface-container": "#efeeea",
+                        "surface-container-low": "#f4f4f0",
+                        "surface-container-high": "#e9e8e4",
+                        "surface": "#faf9f5",
+                        "on-primary-fixed": "#141a32",
+                        "secondary": "#006972",
+                        "on-tertiary-fixed": "#241a00",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#3f465f",
+                        "inverse-primary": "#bfc5e4",
+                        "surface-bright": "#faf9f5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#4e3d00",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "secondary-fixed": "#9ff0fb",
+                        "primary": "#000000",
+                        "surface-dim": "#dbdad6",
+                        "surface-variant": "#e3e2df",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c6c6ce",
+                        "secondary-fixed-dim": "#82d3de",
+                        "primary-fixed": "#dce1ff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#9ff0fb",
+                        "tertiary-fixed": "#ffe088",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312e",
+                        "on-secondary-fixed-variant": "#004f56",
+                        "on-surface": "#1b1c1a",
+                        "on-background": "#1b1c1a",
+                        "surface-container-highest": "#e3e2df",
+                        "on-secondary-container": "#066f79",
+                        "primary-container": "#141a32",
+                        "surface-tint": "#575d78",
+                        "on-secondary-fixed": "#001f23",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f2f1ed",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#bfc5e4",
+                        "background": "#faf9f5",
+                        "error-container": "#ffdad6",
+                        "outline": "#76767e",
+                        "on-surface-variant": "#46464d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "stack-lg": "48px",
+                        "stack-md": "24px",
+                        "unit": "8px",
+                        "stack-sm": "12px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "display-lg-mobile": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg-mobile": ["36px", {"lineHeight": "44px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "caption": ["12px", {"lineHeight": "16px", "fontWeight": "400"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface font-body-md selection:bg-secondary/30">
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 bg-surface/80 backdrop-blur-md shadow-sm">
+<div class="font-headline-md text-headline-md font-bold text-primary">Dubai AI Travel Planner</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="text-secondary border-b-2 border-secondary pb-1 font-label-md text-label-md" href="#">Plan a Trip</a>
+<a class="text-on-surface-variant hover:text-primary transition-opacity font-label-md text-label-md" href="#">Retrieve Plan</a>
+<a class="text-on-surface-variant hover:text-primary transition-opacity font-label-md text-label-md" href="#">How It Works</a>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-80 transition-opacity active:scale-95 duration-150">
+            Multi-Agent AI
+        </button>
+</nav>
+<!-- Hero Section -->
+<main class="pt-32 pb-stack-lg overflow-hidden">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop">
+<div class="flex flex-col lg:flex-row items-center gap-12">
+<div class="flex-1 space-y-stack-md">
+<span class="inline-block px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-md text-label-md">
+                        Powered by Advanced Neural Agents
+                    </span>
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-primary leading-tight">
+                        A Dubai itinerary <br/> built around <span class="text-secondary">you</span>
+</h1>
+<p class="text-body-lg font-body-lg text-on-surface-variant max-w-xl">
+                        Our multi-agent AI system doesn't just search; it negotiates, optimizes, and designs. Five specialized agents work in harmony to research landmarks, calculate logistics, and balance your budget in real-time.
+                    </p>
+<!-- Input Area (Bento-style Card) -->
+<div class="bg-surface-container-lowest desert-noon-shadow p-6 md:p-8 rounded-xl border border-outline-variant/10 space-y-6">
+<div class="space-y-4">
+<label class="font-label-md text-label-md text-secondary block">Tell us about your dream trip</label>
+<div class="relative">
+<textarea class="w-full bg-surface border-2 border-outline-variant/20 rounded-lg p-4 font-body-md text-body-md focus:border-secondary focus:ring-0 transition-all resize-none min-h-[120px]" id="trip-prompt" placeholder="Describe your vision (e.g. 5 days in October, focused on Michelin-star dining and the Old Souks, traveling with 2 kids)..."></textarea>
+<div class="absolute bottom-4 right-4 flex gap-2">
+<span class="material-symbols-outlined text-outline">mic</span>
+<span class="material-symbols-outlined text-outline">attachment</span>
+</div>
+</div>
+<div class="flex flex-wrap gap-2">
+<button class="px-4 py-1.5 bg-surface-container-high hover:bg-surface-variant rounded-full text-caption font-label-md text-on-surface-variant transition-colors" onclick="setPrompt('5 days, $3,000, food and architecture')">
+                                    "5 days, $3,000, food and architecture"
+                                </button>
+<button class="px-4 py-1.5 bg-surface-container-high hover:bg-surface-variant rounded-full text-caption font-label-md text-on-surface-variant transition-colors" onclick="setPrompt('Luxury weekend for two, Burj Khalifa views')">
+                                    "Luxury weekend for two"
+                                </button>
+<button class="px-4 py-1.5 bg-surface-container-high hover:bg-surface-variant rounded-full text-caption font-label-md text-on-surface-variant transition-colors" onclick="setPrompt('Family adventure, desert safari and waterparks')">
+                                    "Family adventure"
+                                </button>
+</div>
+</div>
+<button class="w-full md:w-auto px-8 py-4 bg-primary text-on-primary rounded-lg font-label-md text-label-md flex items-center justify-center gap-3 hover:opacity-90 transition-all active:scale-[0.98]">
+                            Create my itinerary
+                            <span class="material-symbols-outlined">auto_awesome</span>
+</button>
+</div>
+</div>
+<div class="flex-1 w-full relative">
+<div class="relative w-full aspect-square rounded-2xl overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover" data-alt="A cinematic, low-angle photograph of the Burj Khalifa at twilight, reflecting a deep navy and golden sunset sky. The surrounding city of Dubai glows with warm architectural lighting. The visual style is premium, clean, and minimalist, echoing a modern oasis aesthetic with balanced white space and sharp geometric lines." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3FU2cIENIlq1uqGaTmvrpaDX3PlZwZLpmbXQX3FrNqGKcla43sUQfOxnmJZm1vMpSe-azK9gY121seBUp-VPR8oexnxmkOxdK5-P9V254k0RKB_RYBjiQMoxv2ZPzZjxnW0-d_tfvyvjvGhwBmeDnRO4yfNlWqoWRegFpUXA67YUhGvJKX7KEaCZ2vyvwuIfkRwX3YyZ01fwn7jB9Vysh74cmz86dX3twAwJaYoNc3djAQtm9PS4H"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+<div class="absolute bottom-8 left-8 right-8 bg-surface/10 backdrop-blur-xl p-4 rounded-xl border border-white/20">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-secondary rounded-full flex items-center justify-center text-on-secondary">
+<span class="material-symbols-outlined fill-icon">smart_toy</span>
+</div>
+<div>
+<p class="text-white font-label-md text-label-md">Current Optimization</p>
+<p class="text-white/70 text-caption font-caption">Balancing transit times vs landmark density...</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Decorative element -->
+<div class="absolute -top-4 -right-4 w-24 h-24 bg-tertiary-fixed rounded-full blur-3xl opacity-30"></div>
+<div class="absolute -bottom-10 -left-10 w-40 h-40 bg-secondary-fixed rounded-full blur-3xl opacity-20"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- How It Works Section -->
+<section class="py-stack-lg bg-surface-container-low">
+<div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop text-center">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-12">How it works</h2>
+<div class="relative grid grid-cols-1 md:grid-cols-5 gap-8 items-start">
+<!-- Timeline Connector Line (Desktop) -->
+<div class="hidden md:block absolute top-12 left-[10%] right-[10%] h-0.5 timeline-gradient"></div>
+<!-- Step 1 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-16 h-16 rounded-full bg-surface border-2 border-secondary flex items-center justify-center mb-4 desert-noon-shadow group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-secondary text-3xl">psychology</span>
+</div>
+<h3 class="font-label-md text-label-md text-primary mb-2">Understand</h3>
+<p class="text-caption font-caption text-on-surface-variant px-4">AI analyzes your nuances, preferences, and pace.</p>
+</div>
+<!-- Step 2 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-16 h-16 rounded-full bg-surface border-2 border-secondary flex items-center justify-center mb-4 desert-noon-shadow group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-secondary text-3xl">travel_explore</span>
+</div>
+<h3 class="font-label-md text-label-md text-primary mb-2">Research</h3>
+<p class="text-caption font-caption text-on-surface-variant px-4">Simultaneous scans of 500+ local venues.</p>
+</div>
+<!-- Step 3 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-16 h-16 rounded-full bg-surface border-2 border-secondary flex items-center justify-center mb-4 desert-noon-shadow group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-secondary text-3xl">route</span>
+</div>
+<h3 class="font-label-md text-label-md text-primary mb-2">Route</h3>
+<p class="text-caption font-caption text-on-surface-variant px-4">Optimization of logistics and transit paths.</p>
+</div>
+<!-- Step 4 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-16 h-16 rounded-full bg-surface border-2 border-secondary flex items-center justify-center mb-4 desert-noon-shadow group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-secondary text-3xl">payments</span>
+</div>
+<h3 class="font-label-md text-label-md text-primary mb-2">Budget</h3>
+<p class="text-caption font-caption text-on-surface-variant px-4">Financial agent secures the best value slots.</p>
+</div>
+<!-- Step 5 -->
+<div class="relative z-10 flex flex-col items-center group">
+<div class="w-16 h-16 rounded-full bg-surface border-2 border-tertiary-container flex items-center justify-center mb-4 desert-noon-shadow group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-tertiary-container text-3xl">verified</span>
+</div>
+<h3 class="font-label-md text-label-md text-primary mb-2">Review</h3>
+<p class="text-caption font-caption text-on-surface-variant px-4">Final human-like polish for your approval.</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="w-full py-8 px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-lowest border-t border-outline-variant">
+<div class="font-label-md text-label-md font-bold text-primary">Dubai AI Travel Planner</div>
+<p class="text-on-surface-variant font-caption text-caption">© 2024 Dubai AI Travel Planner. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="text-caption font-caption text-on-surface-variant hover:text-primary transition-all" href="#">Privacy Policy</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-primary transition-all" href="#">Terms of Service</a>
+<span class="text-caption font-caption text-secondary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+                Service Status: Online
+            </span>
+</div>
+</footer>
+<script>
+        function setPrompt(text) {
+            const textarea = document.getElementById('trip-prompt');
+            textarea.value = text;
+            textarea.classList.add('border-secondary');
+            setTimeout(() => {
+                textarea.classList.remove('border-secondary');
+            }, 500);
+        }
+
+        // Simple scroll behavior for nav
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 20) {
+                nav.classList.add('shadow-md');
+            } else {
+                nav.classList.remove('shadow-md');
+            }
+        });
+    </script>
+</body></html>

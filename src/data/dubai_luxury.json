@@ -1,0 +1,92 @@
+{
+  "see": [
+    {
+      "name": "Burj Al Arab Helipad Tour",
+      "area": "Jumeirah",
+      "description": "Exclusive access and tour of the iconic Burj Al Arab helipad with panoramic sunset views.",
+      "category": "Sightseeing",
+      "time_slot": "Sunset",
+      "duration_hours": 2,
+      "estimated_cost_usd": 1200.0,
+      "crowd_level": "Low",
+      "tips": "Book weeks in advance; strictly VIP access."
+    }
+  ],
+  "do": [
+    {
+      "name": "Private VIP Desert Safari",
+      "area": "Dubai Desert Conservation Reserve",
+      "description": "Exclusive Range Rover desert safari, private falconry show, and a 6-course fine dining experience in a secluded desert oasis.",
+      "category": "Adventure",
+      "time_slot": "Afternoon to Evening",
+      "duration_hours": 7,
+      "estimated_cost_usd": 3500.0,
+      "crowd_level": "Low",
+      "tips": "Ideal for couples seeking ultimate privacy."
+    },
+    {
+      "name": "Luxury Yacht Charter",
+      "area": "Dubai Marina",
+      "description": "Charter a 100-foot luxury superyacht with a private chef, jet skis, and full crew for a day on the Arabian Gulf.",
+      "category": "Leisure",
+      "time_slot": "Full Day",
+      "duration_hours": 8,
+      "estimated_cost_usd": 8500.0,
+      "crowd_level": "None",
+      "tips": "Perfect for groups; customized menus available."
+    },
+    {
+      "name": "Helicopter Aerial Tour",
+      "area": "Palm Jumeirah",
+      "description": "Private helicopter flight over Palm Jumeirah, The World Islands, and Burj Khalifa.",
+      "category": "Adventure",
+      "time_slot": "Morning",
+      "duration_hours": 1,
+      "estimated_cost_usd": 1500.0,
+      "crowd_level": "Low",
+      "tips": "Bring a camera; morning flights offer the clearest skies."
+    },
+    {
+      "name": "Personal Shopper at The Dubai Mall",
+      "area": "Downtown Dubai",
+      "description": "VIP buggy access and an expert personal stylist guiding you through Fashion Avenue with private fitting rooms.",
+      "category": "Shopping",
+      "time_slot": "Afternoon",
+      "duration_hours": 4,
+      "estimated_cost_usd": 2000.0,
+      "crowd_level": "Low",
+      "tips": "Budget does not include the cost of purchased items."
+    },
+    {
+      "name": "Hot Air Balloon Flight with Caviar Breakfast",
+      "area": "Dubai Desert",
+      "description": "Sunrise hot air balloon ride followed by a gourmet caviar and truffle breakfast.",
+      "category": "Adventure",
+      "time_slot": "Early Morning",
+      "duration_hours": 5,
+      "estimated_cost_usd": 2500.0,
+      "crowd_level": "Low",
+      "tips": "Very early start required."
+    }
+  ],
+  "eat": {
+    "splurge": [
+      {
+        "name": "Ossiano VIP Dining",
+        "area": "Palm Jumeirah",
+        "description": "Submersive Michelin-starred dining experience with a private scuba diver holding a personalized message in the aquarium.",
+        "cuisine": "Seafood / Fine Dining",
+        "price_tier": "splurge",
+        "estimated_cost_usd": 1800.0
+      },
+      {
+        "name": "Al Muntaha Chef's Table",
+        "area": "Jumeirah",
+        "description": "7-star dining at the top of the Burj Al Arab featuring the exclusive chef's tasting menu and wine pairing.",
+        "cuisine": "French / Italian",
+        "price_tier": "splurge",
+        "estimated_cost_usd": 2200.0
+      }
+    ]
+  }
+}

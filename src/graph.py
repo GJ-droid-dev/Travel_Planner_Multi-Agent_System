@@ -68,48 +68,19 @@ def make_task(state: PlanningState, agent_type: AgentType) -> AgentTask:
 # 3. Nodes
 
 async def parse_request_node(state: PlanningState) -> dict:
-    task = AgentTask(
-        task_id=f"parse-{datetime.now().timestamp()}",
-        agent_type=AgentType.ORCHESTRATOR,
-        request=TravelRequest(
-            raw_query=state.get("raw_query", ""), 
-            destination="", 
-            duration_days=0, 
-            budget_usd=0, 
-            travelers=1,
-            areas=[],
-            preferences=[],
-            avoidances=[]
-        ),
-        created_at=datetime.now()
-    )
-    res = await orchestrator_agent.execute(task)
-    if res.status == ResultStatus.SUCCESS:
-        payload = res.payload
-        req = TravelRequest(
-            raw_query=state.get("raw_query", ""),
-            destination=payload.get("destination", ""),
-            duration_days=payload.get("duration_days", 0),
-            budget_usd=payload.get("budget_usd", 0),
-            areas=payload.get("areas", []),
-            preferences=payload.get("preferences", []),
-            avoidances=payload.get("avoidances", []),
-            travelers=payload.get("travelers", 1)
-        )
-        warnings = payload.get("validation_warnings", [])
-        dest_check = req.raw_query.lower()
-        if "dubai" not in dest_check and "uae" not in dest_check:
-            dest_name = payload.get("destination", "")
-            if not dest_name:
-                dest_name = "the requested destination"
-            warnings.append(f"v1 supports Dubai only. Cannot plan for {dest_name}.")
-            
-        if warnings:
-            return {"parsed_request": req, "status": "FAILED", "errors": warnings}
-            
-        return {"parsed_request": req, "status": "PLANNING"}
-    else:
-        return {"status": "FAILED", "errors": ["Parse failed."]}
+    req = state.get("parsed_request")
+    if not req:
+        return {"status": "FAILED", "errors": ["Missing parsed request from API."]}
+        
+    warnings = []
+    dest_check = req.destination.lower()
+    if "dubai" not in dest_check and "uae" not in dest_check:
+        warnings.append(f"v1 supports Dubai only. Cannot plan for {req.destination}.")
+        
+    if warnings:
+        return {"status": "FAILED", "errors": warnings}
+        
+    return {"status": "PLANNING"}
 
 async def destination_node(state: PlanningState) -> dict:
     if state.get("status") == "FAILED":
@@ -138,15 +109,19 @@ async def merge_draft_itinerary_node(state: PlanningState) -> dict:
     log_payload = state.get("logistics_base_result", AgentResult.failed(make_task(state, AgentType.LOGISTICS), "")).payload
     bud_payload = state.get("budget_base_result", AgentResult.failed(make_task(state, AgentType.BUDGET), "")).payload
 
-    activities = dest_payload.get("recommended_activities", [])
+    all_activities = dest_payload.get("recommended_activities", [])
+    activities = list(all_activities)
     days = log_payload.get("daily_sequences", [])
     
     # Naive deterministic assignment
     assigned_days = []
     for d in days:
+        if not activities and all_activities:
+            activities = list(all_activities) # cycle back if we run out
+            
         assigned_days.append({
             "day_number": d.get("day"),
-            "theme": "Exploration",
+            "theme": f"Explore {d.get('base_area', 'Dubai')}",
             "base_area": d.get("base_area"),
             "activities": activities[:2], # just take first 2 for naive draft
             "transport_notes": d.get("transport"),
@@ -176,6 +151,43 @@ async def merge_draft_itinerary_node(state: PlanningState) -> dict:
         elif "categories" not in bud_bd:
             bud_bd["categories"] = {}
 
+    extra_activities = []
+    req_budget = state.get("parsed_request").budget_usd if state.get("parsed_request") else 0.0
+    allocated_budget = 0.0
+    if "categories" in bud_bd and isinstance(bud_bd["categories"], dict):
+        allocated_budget = sum(bud_bd["categories"].values())
+    
+    surplus = req_budget - allocated_budget
+    if surplus > 0:
+        from src.tools.repository import DubaiRepository
+        repo = DubaiRepository()
+        all_repo_activities = repo.get_attractions()
+        
+        # Collect names of activities already assigned
+        assigned_names = set()
+        for d in assigned_days:
+            for a in d.get("activities", []):
+                name = a.get("name") if isinstance(a, dict) else getattr(a, "name", None)
+                if name:
+                    assigned_names.add(name)
+                    
+        # Filter repo activities
+        available_extras = []
+        for a in all_repo_activities:
+            if a.get("name") not in assigned_names:
+                cost = a.get("estimated_cost_usd", 0.0)
+                if cost > 0:
+                    available_extras.append(a)
+                    
+        # Sort by cost descending to prioritize luxury items if we have a big surplus
+        available_extras.sort(key=lambda x: x.get("estimated_cost_usd", 0.0), reverse=True)
+        
+        for act in available_extras:
+            cost = act.get("estimated_cost_usd", 0.0)
+            if cost <= surplus:
+                extra_activities.append(act)
+                surplus -= cost
+
     draft_itinerary = {
         "request": state.get("parsed_request").model_dump() if state.get("parsed_request") else {},
         "days": assigned_days,
@@ -190,6 +202,7 @@ async def merge_draft_itinerary_node(state: PlanningState) -> dict:
             "revision_needed": False,
             "confidence": 0.0
         },
+        "extra_activities": extra_activities,
         "generated_at": datetime.now().isoformat()
     }
 

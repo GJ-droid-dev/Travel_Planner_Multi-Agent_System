@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dubai AI Travel Planner - System States</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&amp;family=Inter:wght@400;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .desert-glow {
+            box-shadow: 0px 4px 20px rgba(10, 17, 40, 0.04);
+        }
+        .bento-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bento-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0px 10px 30px rgba(10, 17, 40, 0.08);
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary": "#735c00",
+                        "tertiary-container": "#cba72f",
+                        "on-primary-container": "#7c839f",
+                        "surface-container": "#efeeea",
+                        "surface-container-low": "#f4f4f0",
+                        "surface-container-high": "#e9e8e4",
+                        "surface": "#faf9f5",
+                        "on-primary-fixed": "#141a32",
+                        "secondary": "#006972",
+                        "on-tertiary-fixed": "#241a00",
+                        "tertiary-fixed-dim": "#e9c349",
+                        "on-primary": "#ffffff",
+                        "on-primary-fixed-variant": "#3f465f",
+                        "inverse-primary": "#bfc5e4",
+                        "surface-bright": "#faf9f5",
+                        "on-tertiary": "#ffffff",
+                        "on-tertiary-container": "#4e3d00",
+                        "on-tertiary-fixed-variant": "#574500",
+                        "secondary-fixed": "#9ff0fb",
+                        "primary": "#000000",
+                        "surface-dim": "#dbdad6",
+                        "surface-variant": "#e3e2df",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c6c6ce",
+                        "secondary-fixed-dim": "#82d3de",
+                        "primary-fixed": "#dce1ff",
+                        "on-error": "#ffffff",
+                        "secondary-container": "#9ff0fb",
+                        "tertiary-fixed": "#ffe088",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#2f312e",
+                        "on-secondary-fixed-variant": "#004f56",
+                        "on-surface": "#1b1c1a",
+                        "on-background": "#1b1c1a",
+                        "surface-container-highest": "#e3e2df",
+                        "on-secondary-container": "#066f79",
+                        "primary-container": "#141a32",
+                        "surface-tint": "#575d78",
+                        "on-secondary-fixed": "#001f23",
+                        "on-secondary": "#ffffff",
+                        "inverse-on-surface": "#f2f1ed",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#bfc5e4",
+                        "background": "#faf9f5",
+                        "error-container": "#ffdad6",
+                        "outline": "#76767e",
+                        "on-surface-variant": "#46464d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-max": "1280px",
+                        "margin-desktop": "64px",
+                        "margin-mobile": "20px",
+                        "stack-lg": "48px",
+                        "stack-md": "24px",
+                        "unit": "8px",
+                        "stack-sm": "12px",
+                        "gutter": "24px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Montserrat"],
+                        "headline-md": ["Montserrat"],
+                        "headline-lg": ["Montserrat"],
+                        "body-lg": ["Inter"],
+                        "caption": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 bg-surface/80 backdrop-blur-md shadow-sm">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-primary">Dubai AI Travel Planner</span>
+<div class="hidden md:flex gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity" href="#">Plan a Trip</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity" href="#">Retrieve Plan</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-opacity" href="#">How It Works</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-6 py-2 bg-primary text-on-primary font-label-md text-label-md rounded-lg hover:opacity-80 transition-opacity">Multi-Agent AI</button>
+</div>
+</nav>
+<main class="pt-32 pb-20 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<!-- Page Header -->
+<header class="mb-12">
+<h1 class="font-display-lg text-display-lg text-primary mb-2">System Diagnostics</h1>
+<p class="text-on-surface-variant max-w-2xl">This interface monitors the status of your travel planning engine. Encountered issues and recovery steps are listed below.</p>
+</header>
+<!-- Bento Grid of States -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- 1. Backend Unavailable (Service Offline) - High Priority Full Width -->
+<section class="md:col-span-12 bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl desert-glow flex flex-col md:flex-row items-center gap-8 bento-card border-l-4 border-l-error">
+<div class="w-24 h-24 flex-shrink-0 bg-error-container/20 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-5xl">cloud_off</span>
+</div>
+<div class="flex-grow text-center md:text-left">
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Service Status: Offline</h2>
+<p class="text-on-surface-variant mb-6 text-body-lg">Our central Dubai Oasis Intelligence engine is currently undergoing maintenance or experiencing heavy load. High-fidelity travel simulations are temporarily paused.</p>
+<div class="flex flex-wrap justify-center md:justify-start gap-4">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-lg font-label-md text-label-md hover:opacity-80 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">refresh</span> Try again
+                        </button>
+<button class="bg-surface border border-outline px-8 py-3 rounded-lg font-label-md text-label-md hover:bg-surface-container-high transition-all">Check System Status</button>
+</div>
+</div>
+</section>
+<!-- 2. Planning Timeout - Large Side Block -->
+<section class="md:col-span-7 bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl desert-glow bento-card">
+<div class="flex justify-between items-start mb-6">
+<span class="material-symbols-outlined text-secondary text-4xl">hourglass_empty</span>
+<span class="px-3 py-1 bg-secondary-container text-on-secondary-container rounded-full font-label-md text-xs uppercase tracking-wider">Timeout Error</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-4">Planning Timeout</h3>
+<p class="text-on-surface-variant mb-8 font-body-md">The AI agent spent too much time analyzing luxury dining options and local heritage sites for your specific dates. The request reached the 60-second limit.</p>
+<div class="bg-surface-container p-4 rounded-lg mb-8 flex items-center gap-4">
+<span class="material-symbols-outlined text-secondary">info</span>
+<span class="text-caption font-caption">Your prompt was saved. You can try resuming the generation process.</span>
+</div>
+<button class="w-full bg-secondary text-on-secondary py-4 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Resume Generation</button>
+</section>
+<!-- 3. Validation Error - Narrow Side Block -->
+<section class="md:col-span-5 bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl desert-glow bento-card flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-4 mb-6">
+<div class="p-3 bg-tertiary-fixed rounded-xl text-on-tertiary-fixed">
+<span class="material-symbols-outlined">edit_note</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Input Validation</h3>
+</div>
+<p class="text-on-surface-variant mb-6 font-body-md">We couldn't process your request: "Go to Mars via Dubai Mall."</p>
+<div class="p-4 bg-error-container/10 border border-error/20 rounded-lg text-error text-caption font-caption mb-8">
+                        The destination must be within the UAE region. Extraterrestrial logistics are not currently supported by our AI agents.
+                    </div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all">Edit Request</button>
+</section>
+<!-- 4. No Plan Found - Medium Block -->
+<section class="md:col-span-6 bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl desert-glow bento-card">
+<div class="aspect-video mb-6 relative overflow-hidden rounded-lg bg-surface-variant">
+<img class="object-cover w-full h-full" data-alt="A minimalist architectural visualization of a futuristic, empty white gallery space in Dubai with soft ambient morning light pouring through geometric windows. The scene is quiet and serene, reflecting a light-mode aesthetic with high-key lighting and a palette of sand, white, and navy." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCasLDFMLXwL21ZKE3HCyw5UhXXqISuKzemgC-mN8Ex-51fGKrS7ch3mN3PKUdGMCqMx6aLtAUonHARWGSaG2D6b5x5sNIEM-Hk3sKjcr_7kWpi2plOmF-9Ju-pDKsW_d7uCeOl3V0c-Z4Yg55-b1_0_shLsRLVYlb4HOBCYPYFvsG9OKEVKe8PxZxiif1_IGap_Uw01_BK75Nw3WPt5_jzvOvQVPXt3bH5eYWJMyNEoyuinZ24GgoL"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-on-surface-variant/40 text-7xl">search_off</span>
+</div>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary mb-2">No Plan Found</h3>
+<p class="text-on-surface-variant mb-6 font-body-md">We searched our archives, but Itinerary ID <span class="font-bold text-primary">#DXB-9921-X</span> does not exist or has expired from our secure cache.</p>
+<div class="flex gap-4">
+<button class="flex-1 bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md">Start New Plan</button>
+<button class="flex-1 bg-surface border border-outline py-3 rounded-lg font-label-md text-label-md">Contact Concierge</button>
+</div>
+</section>
+<!-- 5. Partial Plan / Warnings - Medium Block -->
+<section class="md:col-span-6 bg-surface-container-lowest border border-outline-variant/10 p-8 rounded-xl desert-glow bento-card border-l-4 border-l-tertiary">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-tertiary">warning</span>
+<h3 class="font-headline-md text-headline-md text-primary">Partial Itinerary Ready</h3>
+</div>
+<div class="space-y-4 mb-8">
+<div class="flex gap-4 items-start border-b border-outline-variant/30 pb-4">
+<div class="w-8 h-8 rounded bg-secondary-container flex items-center justify-center flex-shrink-0">
+<span class="material-symbols-outlined text-sm">check</span>
+</div>
+<div>
+<p class="font-label-md text-label-md">Day 1 &amp; 2: Complete</p>
+<p class="text-caption font-caption text-on-surface-variant">Downtown and Marina activities secured.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start">
+<div class="w-8 h-8 rounded bg-tertiary-fixed flex items-center justify-center flex-shrink-0 text-on-tertiary-fixed">
+<span class="material-symbols-outlined text-sm">pending</span>
+</div>
+<div>
+<p class="font-label-md text-label-md">Day 3: Incomplete</p>
+<p class="text-caption font-caption text-error font-semibold">Missing desert excursion availability data.</p>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-3">
+<button class="w-full bg-secondary text-on-secondary py-3 rounded-lg font-label-md text-label-md">View Partial Plan</button>
+<button class="w-full text-secondary py-2 font-label-md text-label-md hover:underline transition-all">Regenerate Day 3 Only</button>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full py-8 px-margin-mobile md:px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4 bg-surface-container-lowest border-t border-outline-variant">
+<div class="flex items-center gap-4">
+<span class="font-label-md text-label-md font-bold text-primary">Dubai AI Travel Planner</span>
+<span class="text-caption font-caption text-on-surface-variant">© 2024. All rights reserved.</span>
+</div>
+<div class="flex gap-6">
+<a class="text-caption font-caption text-on-surface-variant hover:text-primary underline transition-all" href="#">Service Status: Online</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-primary underline transition-all" href="#">Privacy Policy</a>
+<a class="text-caption font-caption text-on-surface-variant hover:text-primary underline transition-all" href="#">Terms of Service</a>
+</div>
+</footer>
+<script>
+        // Micro-interaction for buttons
+        document.querySelectorAll('button').forEach(button => {
+            button.addEventListener('mousedown', () => {
+                button.style.transform = 'scale(0.95)';
+                button.style.transition = 'transform 0.1s ease';
+            });
+            button.addEventListener('mouseup', () => {
+                button.style.transform = 'scale(1)';
+            });
+            button.addEventListener('mouseleave', () => {
+                button.style.transform = 'scale(1)';
+            });
+        });
+
+        // Add subtle hover effect to cards using background tonal shifts
+        document.querySelectorAll('.bento-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                if(!card.classList.contains('bg-error-container/5')) {
+                    card.style.backgroundColor = 'white';
+                }
+            });
+            card.addEventListener('mouseleave', () => {
+                if(!card.classList.contains('bg-error-container/5')) {
+                    card.style.backgroundColor = '';
+                }
+            });
+        });
+    </script>
+</body></html>

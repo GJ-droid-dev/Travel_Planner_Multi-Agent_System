@@ -13,7 +13,9 @@ import pytest_asyncio
 async def app():
     app_instance = create_app()
     from tests.test_api import lifespan_context
+    from src.utils.store import InMemoryPlanStore
     async with lifespan_context(app_instance):
+        app_instance.state.store = InMemoryPlanStore()
         yield app_instance
 
 # Test 8: API whitespace-only payload

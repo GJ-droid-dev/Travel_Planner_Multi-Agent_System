@@ -17,13 +17,30 @@ class DubaiRepository:
         
     def _load_data(self):
         data_path = Path(__file__).parent.parent / "data" / "dubai_wikivoyage.json"
+        luxury_path = Path(__file__).parent.parent / "data" / "dubai_luxury.json"
+        
+        self.data = {}
         try:
             with open(data_path, "r", encoding="utf-8") as f:
                 self.data = json.load(f)
         except Exception as e:
-            print(f"Exception loading JSON from {data_path}: {e}")
             logger.error(f"Failed to load Dubai Wikivoyage data: {e}")
-            self.data = {}
+            
+        try:
+            with open(luxury_path, "r", encoding="utf-8") as f:
+                luxury_data = json.load(f)
+                # Merge into self.data
+                for key in ["see", "do", "buy"]:
+                    if key in luxury_data:
+                        self.data.setdefault(key, []).extend(luxury_data[key])
+                if "eat" in luxury_data:
+                    if "eat" not in self.data:
+                        self.data["eat"] = {}
+                    for tier, rests in luxury_data["eat"].items():
+                        if isinstance(self.data["eat"], dict):
+                            self.data["eat"].setdefault(tier, []).extend(rests)
+        except Exception as e:
+            logger.error(f"Failed to load Dubai luxury data: {e}")
             
         # Combine 'see', 'do', and 'buy' into attractions
         self.attractions = self.data.get("see", []) + self.data.get("do", []) + self.data.get("buy", [])

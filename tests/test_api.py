@@ -18,6 +18,7 @@ async def mock_graph_ainvoke(initial_state: dict, final_state: dict):
 async def app():
     app_instance = create_app()
     async with lifespan_context(app_instance):
+        app_instance.state.store = InMemoryPlanStore()
         yield app_instance
 
 @pytest.mark.asyncio
@@ -67,8 +68,9 @@ async def test_long_query_422(app):
 
 @pytest.mark.asyncio
 async def test_unknown_plan_404(app):
+    import uuid
     async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
-        response = await client.get("/api/v1/plan/invalid_id")
+        response = await client.get(f"/api/v1/plan/{uuid.uuid4()}")
         assert response.status_code == 404
         assert response.json()["error"]["code"] == "PLAN_NOT_FOUND"
 
