@@ -23,8 +23,5 @@ ENV/
 htmlcov/
 .coverage
 
-# Scraping cache
-src/data/dubai_wikivoyage.json
-
 # Local SQLite database
 *.db

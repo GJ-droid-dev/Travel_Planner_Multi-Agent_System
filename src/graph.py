@@ -133,8 +133,8 @@ async def merge_draft_itinerary_node(state: PlanningState) -> dict:
     # Map logistics payload to AccommodationPlan schema
     raw_acc = log_payload.get("accommodation", {}).get("plan", [{}])[0] if log_payload.get("accommodation", {}).get("plan") else {}
     acc_plan = {
-        "hotel_name": raw_acc.get("hotel_suggestion", "Placeholder Hotel"),
-        "area": raw_acc.get("area", "Dubai"),
+        "hotel_name": raw_acc.get("hotel_suggestion") or "TBD Hotel",
+        "area": raw_acc.get("area") or "Dubai",
         "star_rating": 4,
         "total_cost_usd": log_payload.get("accommodation", {}).get("estimated_cost_usd", 0.0),
         "check_in_date": None,
