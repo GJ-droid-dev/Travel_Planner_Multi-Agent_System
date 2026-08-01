@@ -212,9 +212,14 @@ def create_app() -> FastAPI:
                 generated_at=datetime.now()
             )
         except ValidationError as e:
-            log.warning("itinerary_validation_failed", error=str(e))
+            validation_details = [
+                f"{'.'.join(str(p) for p in err.get('loc', []))}: {err.get('msg', 'Invalid value')}"
+                for err in e.errors()
+            ]
+            log.warning("itinerary_validation_failed", error=str(e), details=validation_details)
             errors = final_state.get("errors", [])
             errors.append("Draft itinerary failed schema validation.")
+            errors.extend(validation_details[:10])
             response = PlanResponse(
                 plan_id=plan_id,
                 status="failed",
@@ -302,8 +307,14 @@ def create_app() -> FastAPI:
                     generated_at=datetime.now()
                 )
             except ValidationError as e:
+                validation_details = [
+                    f"{'.'.join(str(p) for p in err.get('loc', []))}: {err.get('msg', 'Invalid value')}"
+                    for err in e.errors()
+                ]
+                log.warning("stream_itinerary_validation_failed", error=str(e), details=validation_details)
                 errors = final_state.get("errors", [])
                 errors.append("Draft itinerary failed schema validation.")
+                errors.extend(validation_details[:10])
                 response = PlanResponse(
                     plan_id=plan_id,
                     status="failed",
