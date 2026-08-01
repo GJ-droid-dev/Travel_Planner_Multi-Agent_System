@@ -26,6 +26,20 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     database_url: str = "postgresql+asyncpg://postgres:postgres@localhost:5432/travel_planner"
 
+    @staticmethod
+    def _normalize_origin(origin: str) -> str:
+        value = origin.strip().rstrip("/")
+        if not value:
+            return ""
+
+        if value.startswith(("http://", "https://")):
+            return value
+
+        if value.startswith(("localhost", "127.0.0.1")):
+            return f"http://{value}"
+
+        return f"https://{value}"
+
     @field_validator("database_url")
     @classmethod
     def to_async_database_url(cls, url: str) -> str:
@@ -43,7 +57,7 @@ class Settings(BaseSettings):
     @classmethod
     def parse_cors_origins(cls, value: object) -> List[str]:
         if isinstance(value, list):
-            return [str(item).strip() for item in value if str(item).strip()]
+            return [normalized for item in value if (normalized := cls._normalize_origin(str(item)))]
 
         if isinstance(value, str):
             raw = value.strip()
@@ -58,9 +72,9 @@ class Settings(BaseSettings):
                     raise ValueError("CORS_ORIGINS JSON array is invalid") from exc
                 if not isinstance(parsed, list):
                     raise ValueError("CORS_ORIGINS must be a JSON array or comma-separated string")
-                return [str(item).strip() for item in parsed if str(item).strip()]
+                return [normalized for item in parsed if (normalized := cls._normalize_origin(str(item)))]
 
-            return [item.strip() for item in raw.split(",") if item.strip()]
+            return [normalized for item in raw.split(",") if (normalized := cls._normalize_origin(item))]
 
         raise ValueError("CORS_ORIGINS must be a list, JSON array string, or comma-separated string")
 
