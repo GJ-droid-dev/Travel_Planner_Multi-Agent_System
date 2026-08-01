@@ -9,9 +9,11 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir uv==0.5.31
 
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --no-install-project
 
-COPY . .
+COPY src ./src
+COPY alembic ./alembic
+COPY alembic.ini ./alembic.ini
 
 EXPOSE 8000
 
