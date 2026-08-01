@@ -1,0 +1,3 @@
+[variables]
+# Prevent Railway/Nixpacks from producing `pip install uv==` with an empty version.
+NIXPACKS_UV_VERSION = "0.5.31"
