@@ -97,17 +97,6 @@ export default function RetrievePage() {
             </p>
           </div>
         </div>
-
-        {/* Help card */}
-        <div className="mt-[var(--spacing-stack-md)] bg-white/50 border border-outline-variant/20 p-4 rounded-lg flex items-center gap-4 transition-transform hover:scale-[1.02] cursor-pointer">
-          <div className="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center">
-            <span className="material-symbols-outlined text-tertiary fill-icon">stars</span>
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-primary">Need help finding your ID?</p>
-            <p className="text-xs text-on-surface-variant">Check your email or text messages.</p>
-          </div>
-        </div>
       </div>
     </div>
   );
