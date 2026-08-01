@@ -1,7 +1,25 @@
-const API_BASE = import.meta.env.VITE_API_URL || '';
+function normalizeApiBase(rawBase) {
+  if (!rawBase) return '';
+
+  const trimmed = rawBase.trim().replace(/\/+$/, '');
+  if (!trimmed) return '';
+
+  // If protocol is missing, assume HTTPS for hosted deployments.
+  if (!/^https?:\/\//i.test(trimmed)) {
+    return `https://${trimmed}`;
+  }
+
+  return trimmed;
+}
+
+const API_BASE = normalizeApiBase(import.meta.env.VITE_API_URL || '');
+
+function apiUrl(path) {
+  return API_BASE ? `${API_BASE}${path}` : path;
+}
 
 export async function createPlan(payload, onProgress) {
-  const res = await fetch(`${API_BASE}/api/v1/plan/stream`, {
+  const res = await fetch(apiUrl('/api/v1/plan/stream'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
@@ -59,7 +77,7 @@ export async function createPlan(payload, onProgress) {
 }
 
 export async function getPlan(planId) {
-  const res = await fetch(`${API_BASE}/api/v1/plan/${planId}`);
+  const res = await fetch(apiUrl(`/api/v1/plan/${planId}`));
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
     throw { status: res.status, ...err };
@@ -68,6 +86,6 @@ export async function getPlan(planId) {
 }
 
 export async function getHealth() {
-  const res = await fetch(`${API_BASE}/api/v1/health`);
+  const res = await fetch(apiUrl('/api/v1/health'));
   return res.json();
 }
