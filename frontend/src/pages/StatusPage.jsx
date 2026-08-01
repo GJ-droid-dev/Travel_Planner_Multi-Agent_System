@@ -90,7 +90,7 @@ export default function StatusPage() {
     <div className="flex flex-col items-center min-h-[80vh] px-[var(--spacing-margin-mobile)] md:px-[var(--spacing-margin-desktop)] max-w-[var(--spacing-container-max)] mx-auto w-full py-12 gap-[var(--spacing-stack-md)]">
 
       {/* Central Animation */}
-      <section className="flex-grow flex flex-col items-center justify-center py-[var(--spacing-stack-lg)]">
+      <section className="flex-grow flex flex-col items-center justify-center py-[var(--spacing-stack-lg)] select-none">
         <div className="relative w-full max-w-lg flex items-center justify-center mb-[var(--spacing-stack-md)]">
           <div className="flex flex-col items-center text-center px-6">
             <div className="w-24 h-24 rounded-full bg-white shadow-xl flex items-center justify-center mb-6 pulse-soft">
@@ -104,7 +104,7 @@ export default function StatusPage() {
             </p>
             <div className="mt-4 inline-flex items-center gap-2 bg-surface-container-high px-3 py-1.5 rounded-full border border-outline-variant/30">
               <span className="material-symbols-outlined text-sm text-tertiary">timer</span>
-              <span className="text-sm font-medium text-on-surface-variant">Time elapsed: {elapsedSeconds}s <span className="opacity-50">/ ~20s</span></span>
+              <span className="text-sm font-medium text-on-surface-variant">Time elapsed: {elapsedSeconds}s <span className="opacity-50">/ ~30 secs to 1 min</span></span>
             </div>
           </div>
         </div>
@@ -158,7 +158,7 @@ export default function StatusPage() {
         {/* Cancel button */}
         <button
           onClick={handleCancel}
-          className="mt-8 flex items-center gap-2 text-on-surface-variant text-sm font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+          className="mt-8 flex items-center gap-2 text-on-surface-variant text-sm font-semibold hover:opacity-80 transition-opacity cursor-pointer select-auto"
         >
           <span className="material-symbols-outlined">arrow_back</span>
           Cancel

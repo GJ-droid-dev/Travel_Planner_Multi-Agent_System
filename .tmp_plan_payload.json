@@ -1,0 +1,13 @@
+{
+  "destination": "Dubai, UAE",
+  "duration_days": 3,
+  "budget_amount": 8000,
+  "budget_currency": "USD",
+  "budget_scope": "Total trip",
+  "travelers": 2,
+  "include_accommodation": true,
+  "interests": ["culture", "food"],
+  "avoidances": [],
+  "travel_dates": "2026-09-10 to 2026-09-13",
+  "extra_notes": "budget 8000 probe"
+}
